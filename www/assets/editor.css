@@ -1,0 +1,110 @@
+body {
+  background: #222;
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 10px;
+}
+
+#container {
+  display: flex;
+  gap: 15px;
+}
+
+#map {
+  position: relative;
+  width: 480px;
+  height: 480px;
+  background: #333;
+  border: 2px solid #555;
+  display: grid;
+  grid-template-columns: repeat(16, 30px);
+  grid-template-rows: repeat(16, 30px);
+}
+
+.room {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #555;
+  box-sizing: border-box;
+  background: #555;
+  cursor: pointer;
+  position: relative;
+}
+
+.room.current {
+  background: #2a9fd6;
+  border-color: #08f;
+}
+
+.line {
+  position: absolute;
+  background: white;
+  height: 2px;
+  transform-origin: 0 0;
+}
+
+#room-details {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+#room-details label {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+#room-details input[type=text],
+#room-details textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+  border-radius: 3px;
+  border: none;
+  font-size: 14px;
+  resize: vertical;
+}
+
+#room-details textarea {
+  height: 100px;
+}
+
+#save-room {
+  margin-top: 15px;
+  padding: 8px;
+  background: #2a9fd6;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+#directions {
+  margin-top: 15px;
+  user-select: none;
+}
+
+#directions button {
+  background: #444;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  width: 60px;
+  height: 40px;
+  margin: 2px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+#directions button:hover {
+  background: #08f;
+}
+
+#floor-label {
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 18px;
+  color: white;
+}

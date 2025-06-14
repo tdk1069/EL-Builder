@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LPC MUD Area Editor</title>
+<link rel="stylesheet" href="assets/editor.css" />
+</head>
+<body>
+
+<div id="floorLabel">Floor: 0</div>
+
+<div id="container">
+  <div id="map"></div>
+
+  <div id="room-details">
+    <h3>Room Details</h3>
+    <label>Short:</label>
+    <input type="text" id="short" />
+    <label>Long:</label>
+    <textarea id="long"></textarea>
+    <label>Smell:</label>
+    <input type="text" id="smell" />
+    <label>Items (comma separated):</label>
+    <input type="text" id="items" />
+    <button id="saveBtn">Save Room</button>
+  </div>
+</div>
+
+<div id="directions">
+  <button data-dir="dig-nw">↖ NW</button>
+  <button data-dir="dig-n">↑ N</button>
+  <button data-dir="dig-ne">↗ NE</button><br/>
+  <button data-dir="dig-w">← W</button>
+  <button data-dir="dig-down">↓ Down</button>
+  <button data-dir="dig-e">→ E</button><br/>
+  <button data-dir="dig-sw">↙ SW</button>
+  <button data-dir="dig-s">↓ S</button>
+  <button data-dir="dig-se">↘ SE</button><br/>
+  <button data-dir="dig-up">↑ Up</button>
+</div>
+
+<script src="assets/editor.js"></script>
+</body>
+</html>

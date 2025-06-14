@@ -1,0 +1,44 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8765:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./www:/var/www/html
+    depends_on:
+      - php
+    networks:
+      - lampnet
+
+  php:
+    build: ./php
+    volumes:
+      - ./www:/var/www/html
+    networks:
+      - lampnet
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: S!cr9t
+    volumes:
+      - ./mariadb_data:/var/lib/mysql
+    networks:
+      - lampnet
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+    networks:
+      - lampnet
+
+networks:
+  lampnet:
+    driver: bridge

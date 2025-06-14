@@ -1,0 +1,3 @@
+# Ignore Docker volumes and config folders
+maria_data/
+nginx/

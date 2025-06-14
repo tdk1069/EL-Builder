@@ -1,0 +1,457 @@
+<?php
+// editor.php
+session_start();
+require 'auth/db.php';
+
+if (!isset($_SESSION['username'])) {
+    header('Location: login.html');
+    exit;
+}
+
+$areaId = $_GET['id'] ?? '';
+if (!$areaId) {
+    die('No area specified.');
+}
+
+$pdo = require 'auth/db.php';
+$stmt = $pdo->prepare("SELECT * FROM areas WHERE id = ? AND username = ?");
+$stmt->execute([$areaId, $_SESSION['username']]);
+$area = $stmt->fetch();
+
+if (!$area) {
+    die('Area not found or access denied.');
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Area Designer - <?= htmlspecialchars($area->name) ?></title>
+  <style>
+    body {
+      display: flex;
+      font-family: sans-serif;
+      background: #222;
+      color: #eee;
+      margin: 0; 
+      padding: 0;
+      height: 100vh;
+    }
+    /* Make #map scrollable and remove padding so SVG aligns perfectly */
+    #map {
+      position: relative;
+      width: 462px;   /* 11 * (40 + 2) = 462 */
+      height: 462px;  /* 11 * (40 + 2) = 462 */
+      background: #111;
+      overflow: auto;
+      box-sizing: content-box;
+      user-select: none;
+      border-right: 2px solid #555;
+      border-bottom: 2px solid #555;
+    }
+    /* SVG now covers the full 462×462 area, no offset */
+    #map-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 462px;
+      height: 462px;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .room {
+      position: absolute;
+      z-index: 1;
+      width: 40px;
+      height: 40px;
+      background: #444;
+      border: 1px solid #888;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      box-sizing: border-box;
+      transition: background-color 0.2s, box-shadow 0.2s, color 0.2s;
+    }
+    .room.current {
+      background: gold;
+      color: black;
+      font-weight: bold;
+      box-shadow: 0 0 8px gold;
+    }
+    .room.edited {
+      /* Highlight edited rooms with a bluish tint */
+      background: #3366bb;
+      border-color: #88aaff;
+      color: #fff;
+    }
+    #controls {
+      flex: 1;
+      padding: 20px;
+      background: #333;
+      display: flex;
+      flex-direction: column;
+    }
+    button {
+      margin: 2px;
+      cursor: pointer;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .compass {
+      display: grid;
+      grid-template-columns: 40px 40px 40px;
+      grid-template-rows: 40px 40px 40px;
+      gap: 2px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .compass button {
+      width: 40px;
+      height: 40px;
+      background: #555;
+      border: none;
+      color: #eee;
+      font-weight: bold;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    .compass button:hover {
+      background: #777;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #666;
+      background: #222;
+      color: #eee;
+      box-sizing: border-box;
+      font-size: 14px;
+      resize: vertical;
+    }
+    textarea {
+      min-height: 80px;
+    }
+    #items-container {
+      margin-top: 10px;
+      background: #444;
+      padding: 10px;
+      border-radius: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .item-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .item-row input[type="text"] {
+      flex: 1;
+      margin-right: 6px;
+      background: #222;
+      color: #eee;
+      border: 1px solid #666;
+      border-radius: 4px;
+      padding: 4px;
+    }
+    .item-row button {
+      background: #a33;
+      border: none;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+    #add-item-btn {
+      margin-top: 5px;
+      background: #3a3;
+      border: none;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="map">
+    <svg id="map-lines"></svg>
+  </div>
+
+  <div id="controls">
+    <h3>Editing: <?= htmlspecialchars($area->name) ?></h3>
+
+    <strong>Movement</strong>
+    <div class="compass">
+      <button onclick="move('nw')">NW</button>
+      <button onclick="move('n')">N</button>
+      <button onclick="move('ne')">NE</button>
+
+      <button onclick="move('w')">W</button>
+      <div></div>
+      <button onclick="move('e')">E</button>
+
+      <button onclick="move('sw')">SW</button>
+      <button onclick="move('s')">S</button>
+      <button onclick="move('se')">SE</button>
+    </div>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <button onclick="move('u')">Up</button>
+      <button onclick="move('d')">Down</button>
+    </div>
+
+    <div class="form-group">
+      <label for="shortDesc">Short Description:</label>
+      <input type="text" id="shortDesc" />
+    </div>
+
+    <div class="form-group">
+      <label for="longDesc">Long Description:</label>
+      <textarea id="longDesc"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="smell">Smell:</label>
+      <input type="text" id="smell" />
+    </div>
+
+    <div class="form-group">
+      <label>Items in Room:</label>
+      <div id="items-container"></div>
+      <button id="add-item-btn" onclick="addItem()">+ Add Item</button>
+    </div>
+
+    <button onclick="saveRoom()" style="margin-top: auto; padding: 10px; font-size: 16px; font-weight: bold;">Save Room</button>
+  </div>
+
+  <script>
+    const areaId = <?= json_encode($areaId) ?>;
+    const gridSize = 11;
+    const cellSize = 40;
+    const gapSize = 2;
+    const totalCellSize = cellSize + gapSize; // 42
+
+    // Current user position on the grid (start in the center)
+    let currentPos = { x: 5, y: 5, z: 0 };
+
+    // Rooms data – for demo; in production you’d fetch from your backend
+    // key = "x,y,z", value = { exits: {dir:"x,y,z"}, short, long, smell, items }
+    let rooms = {
+      "5,5,0": {
+        exits: { n: "5,4,0", e: "6,5,0" },
+        short: "Start Room",
+        long: "This is the starting room.",
+        smell: "Fresh air.",
+        items: [{ name: "Lantern", desc: "A rusty lantern." }]
+      },
+      "5,4,0": {
+        exits: { s: "5,5,0" },
+        short: "North Room",
+        long: "You are in a chilly northern chamber.",
+        smell: "Cold breeze.",
+        items: []
+      },
+      "6,5,0": {
+        exits: { w: "5,5,0" },
+        short: "East Room",
+        long: "A bright room to the east.",
+        smell: "Sunlight.",
+        items: []
+      }
+    };
+
+    const mapDiv = document.getElementById('map');
+    const svg = document.getElementById('map-lines');
+    const shortDescInput = document.getElementById('shortDesc');
+    const longDescInput = document.getElementById('longDesc');
+    const smellInput = document.getElementById('smell');
+    const itemsContainer = document.getElementById('items-container');
+
+    // Convert grid coords to center‐of‐cell coordinates within SVG
+    function posToCoords(x, y) {
+      return {
+        cx: x * totalCellSize + cellSize / 2,
+        cy: y * totalCellSize + cellSize / 2
+      };
+    }
+
+    function drawLines() {
+      svg.innerHTML = '';
+      for (const [key, room] of Object.entries(rooms)) {
+        const [x, y, z] = key.split(',').map(Number);
+        if (z !== currentPos.z) continue; // only draw lines on current Z‐level
+
+        const start = posToCoords(x, y);
+        if (!room.exits) continue;
+
+        for (const [dir, destKey] of Object.entries(room.exits)) {
+          if (!rooms[destKey]) continue;
+          const [dx, dy, dz] = destKey.split(',').map(Number);
+          if (dz !== currentPos.z) continue;
+
+          const end = posToCoords(dx, dy);
+          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          line.setAttribute('x1', start.cx);
+          line.setAttribute('y1', start.cy);
+          line.setAttribute('x2', end.cx);
+          line.setAttribute('y2', end.cy);
+          line.setAttribute('stroke', '#ffa500');
+          line.setAttribute('stroke-width', '3');
+          line.setAttribute('stroke-linecap', 'round');
+          svg.appendChild(line);
+        }
+      }
+    }
+
+    function drawMap() {
+      // Clear existing room DIVs
+      Array.from(mapDiv.querySelectorAll('.room')).forEach(el => el.remove());
+
+      // Draw each cell in an 11×11 grid
+      for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+          const key = `${x},${y},${currentPos.z}`;
+          const div = document.createElement('div');
+          div.className = 'room';
+
+          // If this is an "edited" room, apply the .edited class
+          if (rooms[key] && (
+              (rooms[key].short && rooms[key].short.trim() !== '') ||
+              (rooms[key].long && rooms[key].long.trim() !== '') ||
+              (rooms[key].smell && rooms[key].smell.trim() !== '') ||
+              (rooms[key].items && rooms[key].items.length > 0)
+            )
+          ) {
+            div.classList.add('edited');
+          }
+
+          // Mark the current position
+          if (x === currentPos.x && y === currentPos.y) {
+            div.classList.add('current');
+          }
+
+          // Position it absolutely
+          div.style.left = `${x * totalCellSize}px`;
+          div.style.top = `${y * totalCellSize}px`;
+          mapDiv.appendChild(div);
+        }
+      }
+
+      // Then draw the lines on top (so that new rooms/exits are visible)
+      drawLines();
+
+      // Scroll so that the current room stays centered in #map
+      // We want center‐of‐cell coordinate in pixels:
+      const centerPxX = currentPos.x * totalCellSize + (cellSize / 2);
+      const centerPxY = currentPos.y * totalCellSize + (cellSize / 2);
+
+      // Center of the visible #map area:
+      const halfViewportW = mapDiv.clientWidth / 2;
+      const halfViewportH = mapDiv.clientHeight / 2;
+
+      mapDiv.scrollLeft = centerPxX - halfViewportW + 1; // +1 to offset the 1px border
+      mapDiv.scrollTop  = centerPxY - halfViewportH + 1;
+    }
+
+    function updateRoomForm() {
+      const key = `${currentPos.x},${currentPos.y},${currentPos.z}`;
+      const room = rooms[key] || { exits: {}, short: '', long: '', smell: '', items: [] };
+
+      shortDescInput.value = room.short || '';
+      longDescInput.value = room.long || '';
+      smellInput.value = room.smell || '';
+
+      itemsContainer.innerHTML = '';
+      (room.items || []).forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `
+          <input type="text" value="${item.name}" placeholder="Item name" />
+          <input type="text" value="${item.desc}" placeholder="Item description" />
+          <button onclick="removeItem(${idx})">X</button>
+        `;
+        itemsContainer.appendChild(row);
+      });
+    }
+
+    function addItem() {
+      const key = `${currentPos.x},${currentPos.y},${currentPos.z}`;
+      if (!rooms[key]) {
+        rooms[key] = { exits: {}, short: '', long: '', smell: '', items: [] };
+      }
+      rooms[key].items.push({ name: '', desc: '' });
+      updateRoomForm();
+    }
+
+    function removeItem(index) {
+      const key = `${currentPos.x},${currentPos.y},${currentPos.z}`;
+      if (!rooms[key]) return;
+      rooms[key].items.splice(index, 1);
+      updateRoomForm();
+    }
+
+    function saveRoom() {
+      const key = `${currentPos.x},${currentPos.y},${currentPos.z}`;
+      if (!rooms[key]) {
+        rooms[key] = { exits: {}, items: [] };
+      }
+      const room = rooms[key];
+
+      room.short = shortDescInput.value.trim();
+      room.long = longDescInput.value.trim();
+      room.smell = smellInput.value.trim();
+
+      room.items = Array.from(itemsContainer.querySelectorAll('.item-row')).map(row => {
+        const inputs = row.querySelectorAll('input');
+        return {
+          name: inputs[0].value.trim(),
+          desc: inputs[1].value.trim()
+        };
+      });
+
+      alert("Room saved locally (for now)");
+      drawMap(); // re‐draw so the “edited” highlight appears immediately
+    }
+
+    function move(dir) {
+      const delta = {
+        n: [0, -1, 0],
+        s: [0, 1, 0],
+        e: [1, 0, 0],
+        w: [-1, 0, 0],
+        ne: [1, -1, 0],
+        nw: [-1, -1, 0],
+        se: [1, 1, 0],
+        sw: [-1, 1, 0],
+        u: [0, 0, 1],
+        d: [0, 0, -1]
+      }[dir] || [0, 0, 0];
+
+      currentPos.x += delta[0];
+      currentPos.y += delta[1];
+      currentPos.z += delta[2];
+
+      // Clamp to grid boundaries (0..10)
+      currentPos.x = Math.max(0, Math.min(gridSize - 1, currentPos.x));
+      currentPos.y = Math.max(0, Math.min(gridSize - 1, currentPos.y));
+
+      drawMap();
+      updateRoomForm();
+    }
+
+    // Initial render
+    drawMap();
+    updateRoomForm();
+  </script>
+</body>
+</html>
