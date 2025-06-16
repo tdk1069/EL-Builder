@@ -197,7 +197,8 @@ function saveRoom() {
     set_long: document.getElementById('set_long').value,
     set_smell: document.getElementById('set_smell').value,
     set_items: getItems(),
-    exits: grid[key(currentX, currentY, currentZ)]?.exits || {}
+    exits: grid[key(currentX, currentY, currentZ)]?.exits || {},
+    monsters: getMonsters()
   };
   grid[key(currentX, currentY, currentZ)] = room;
   drawMap();
@@ -276,13 +277,24 @@ function loadRoom() {
   document.getElementById('set_smell').value = room.set_smell || '';
 
   // Clear existing item inputs
-  const container = document.getElementById('itemsContainer');
-  container.innerHTML = '';
+  const itemContainer = document.getElementById('itemsContainer');
+  itemContainer.innerHTML = '';
 
   // Load each item
   if (Array.isArray(room.set_items)) {
     room.set_items.forEach(item => {
       addItemRow(item.name, item.description);
+    });
+  }
+
+  // Clear existing monster inputs
+  const monsterContainer = document.getElementById('monsterContainer');
+  monsterContainer.innerHTML = '';
+
+  // Load each monster ID (if any)
+  if (Array.isArray(room.monsters)) {
+    room.monsters.forEach(monsterID => {
+      addMonsterRow(monsterID);
     });
   }
 }
@@ -725,6 +737,69 @@ function showTab(tabId) {
 
   document.getElementById('tab-' + tabId).style.display = 'block';
   event.target.classList.add('active');
+}
+
+function addMonsterRow(selectedId = '') {
+  const container = document.getElementById('monsterContainer');
+
+  const row = document.createElement('div');
+  row.classList.add('monster-row');
+  row.style.marginBottom = '6px';
+
+  const select = document.createElement('select');
+  select.name = 'monster_id[]';
+
+  // Default placeholder
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = '-- Select a monster --';
+  select.appendChild(placeholder);
+
+  // Fetch monsters via AJAX
+  fetch('get_monsters.php')
+    .then(response => response.json())
+    .then(data => {
+      data.forEach(monster => {
+        const option = document.createElement('option');
+        option.value = monster.id;
+        option.textContent = monster.set_short || '(no name)';
+        select.appendChild(option);
+      });
+      // Set default selected after options are loaded
+      if (selectedId) {
+        select.value = selectedId.toString();
+      }
+    })
+    .catch(err => {
+      console.error('Error fetching monsters:', err);
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'Error loading monsters';
+      select.appendChild(option);
+    });
+
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.textContent = '-';
+  removeBtn.addEventListener('click', () => {
+    row.remove();
+  });
+
+  row.appendChild(select);
+  row.appendChild(removeBtn);
+  container.appendChild(row);
+}
+
+function getMonsters() {
+  const selects = document.querySelectorAll('#monsterContainer select');
+  const ids = [];
+
+  selects.forEach(select => {
+    const id = parseInt(select.value);
+    if (!isNaN(id)) ids.push(id);
+  });
+
+  return ids;
 }
 
 

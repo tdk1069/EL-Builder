@@ -56,19 +56,32 @@ try {
 		)
 	");
 
-// Create monsters table if missing
-$pdo->exec("
-    CREATE TABLE IF NOT EXISTS monsters (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        owner VARCHAR(255) NOT NULL,
-        set_short TEXT,
-        set_long TEXT,
-        set_class TEXT NOT NULL,
-        set_race TEXT NOT NULL,
-        set_level INT NOT NULL,
-        set_gender TEXT NOT NULL
-    )
-");
+    // Create monsters table if missing
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS monsters (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            owner VARCHAR(255) NOT NULL,
+            set_short TEXT,
+            set_long TEXT,
+            set_class TEXT NOT NULL,
+            set_race TEXT NOT NULL,
+            set_level INT NOT NULL,
+            set_gender TEXT NOT NULL
+        )
+    ");
+
+    // Create MonsterRooms table if missing
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS MonsterRooms (
+            monster_id INT NOT NULL,
+            room_id INT NOT NULL,
+            area_id INT NOT NULL,
+            PRIMARY KEY (monster_id, room_id),
+            FOREIGN KEY (monster_id) REFERENCES monsters(id) ON DELETE CASCADE,
+            FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE,
+            FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE
+        );
+   ");
 
 // --- Schema builder: ensure table and column exist ---
 try {
