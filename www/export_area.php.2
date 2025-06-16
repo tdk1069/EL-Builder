@@ -49,33 +49,6 @@ $areaName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $area->name); // sanitize fol
 $basePath = rtrim($area->basePath, '/') . '/';
 $baseLevel = $area->levelRange;
 
-$coordToFile = [];
-$existingNames = [];
-
-function makeSafeFileName($short) {
-    $safe = strtolower($short);
-    $safe = preg_replace('/[^a-z0-9]+/', '_', $safe); // Replace non-alphanumerics with underscores
-    $safe = trim($safe, '_'); // Trim leading/trailing underscores
-    return $safe;
-}
-
-// First pass: assign filenames and store mapping
-foreach ($grid as $coords => $room) {
-    $short = $room['set_short'] ?? 'A Room';
-    $baseName = makeSafeFileName($short);
-    $fileName = $baseName . ".c";
-
-    $counter = 1;
-    while (in_array($fileName, $existingNames)) {
-        $fileName = $baseName . "_" . str_pad($counter, 2, '0', STR_PAD_LEFT) . ".c";
-        $counter++;
-    }
-
-    $existingNames[] = $fileName;
-    $coordToFile[$coords] = $fileName;
-}
-
-
 // Create temporary export folder
 $baseDir = sys_get_temp_dir() . "/export_$areaName";
 @mkdir("$baseDir/include", 0777, true);
@@ -144,8 +117,7 @@ C;
 
 // Generate room files
 foreach ($grid as $coords => $room) {
-//    $fileName = "room_" . str_replace(',', '_', $coords) . ".c";
-    $fileName = $coordToFile[$coords];
+    $fileName = "room_" . str_replace(',', '_', $coords) . ".c";
     $short = addslashes($room['set_short'] ?? 'A Room');
     $long = addslashes(trim($room['set_long'] ?? ''));
     $items = $room['set_items'] ?? [];
@@ -162,8 +134,7 @@ foreach ($grid as $coords => $room) {
     $exitStrs = [];
     foreach ($exits as $dir => $target) {
         $targetCoords = "room_" . str_replace(',', '_', $target);
-	$targetFile = $coordToFile[$target];
-        $exitStrs[] = '        "' . $dir . '": ROOMDIR + "' . $targetFile . '"';
+        $exitStrs[] = '        "' . $dir . '": ROOMDIR + "' . $targetCoords . '"';
     }
     $exitBlock = empty($exitStrs) ? '' : "    set_exits(([\n" . implode(",\n", $exitStrs) . "\n    ]));\n";
 
