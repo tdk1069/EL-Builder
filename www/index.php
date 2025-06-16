@@ -69,7 +69,7 @@
 <body>
 
 <div class="parchment-box">
-  <h2>Enter the Realm</h2>
+  <h2>El'Builder</h2>
   <form id="loginForm">
     <div class="mb-3">
       <label class="form-label">Username</label>

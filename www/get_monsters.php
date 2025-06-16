@@ -4,7 +4,7 @@ $username = $_SESSION['username'] ?? '';
 
 require 'auth/db.php'; // contains $pdo
 
-$stmt = $pdo->prepare("SELECT id, set_short FROM monsters WHERE owner = ?");
+$stmt = $pdo->prepare("SELECT * FROM monsters WHERE owner = ?");
 $stmt->execute([$username]);
 $monsters = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

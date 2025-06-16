@@ -47,7 +47,10 @@
 <!-- header.php -->
 <div class="mud-header-wrapper">
   <header class="mud-header">
-    <div class="mud-header-title">Fantasy MUD Editor</div>
+    <div class="mud-header-title">
+      <img src="assets/background.svg" height="80px" alt="Logo" style="vertical-align: middle; margin-right: 8px;">
+      El'Builder
+    </div>
     <nav class="mud-header-nav">
       <a href="dashboard.php">Dashboard</a>
       <a href="object.php">Objects</a>

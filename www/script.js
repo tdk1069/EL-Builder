@@ -762,7 +762,7 @@ function addMonsterRow(selectedId = '') {
       data.forEach(monster => {
         const option = document.createElement('option');
         option.value = monster.id;
-        option.textContent = monster.set_short || '(no name)';
+        option.textContent = monster.id + ' ' + monster.set_short  + ' (' + monster.set_class + ')' || '(no name)';
         select.appendChild(option);
       });
       // Set default selected after options are loaded
