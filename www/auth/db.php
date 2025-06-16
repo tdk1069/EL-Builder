@@ -62,6 +62,7 @@ try {
             id INT AUTO_INCREMENT PRIMARY KEY,
             owner VARCHAR(255) NOT NULL,
             set_short TEXT,
+            set_name TEXT,
             set_long TEXT,
             set_class TEXT NOT NULL,
             set_race TEXT NOT NULL,

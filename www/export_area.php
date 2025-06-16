@@ -79,6 +79,7 @@ if (!is_dir($monsterDir)) {
 
 foreach ($monsters as $monster) {
     $short = addslashes($monster['set_short'] ?? 'A Creature');
+    $set_name = addslashes($monster['set_name'] ?? 'creature');
     $long = addslashes(trim($monster['set_long'] ?? 'It looks unremarkable.'));
     $name = strtolower(preg_replace('/[^a-zA-Z0-9]/', '_', $monster['set_short'] ?? 'creature'));
 
@@ -100,7 +101,7 @@ inherit MONSTER;
 void create()
 {
     ::create();
-    set_name("{$name}");
+    set_name("{$set_name}");
     set_id(({"{$name}"}));
     set_short("{$short}");
     set_long("{$long}");
