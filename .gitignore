@@ -1,3 +1,4 @@
 # Ignore Docker volumes and config folders
 mariadb_data/
 nginx/
+www/auth/db.php

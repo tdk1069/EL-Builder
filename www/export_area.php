@@ -63,11 +63,11 @@ function makeSafeFileName($short) {
 foreach ($grid as $coords => $room) {
     $short = $room['set_short'] ?? 'A Room';
     $baseName = makeSafeFileName($short);
-    $fileName = $baseName . ".c";
+    $fileName = $baseName; // . ".c";
 
     $counter = 1;
     while (in_array($fileName, $existingNames)) {
-        $fileName = $baseName . "_" . str_pad($counter, 2, '0', STR_PAD_LEFT) . ".c";
+        $fileName = $baseName . "_" . str_pad($counter, 2, '0', STR_PAD_LEFT); // . ".c";
         $counter++;
     }
 
@@ -163,7 +163,8 @@ foreach ($grid as $coords => $room) {
     foreach ($exits as $dir => $target) {
         $targetCoords = "room_" . str_replace(',', '_', $target);
 	$targetFile = $coordToFile[$target];
-        $exitStrs[] = '        "' . $dir . '": ROOMDIR + "' . $targetFile . '"';
+        $targetFileNoExt = pathinfo($targetFile, PATHINFO_FILENAME);
+        $exitStrs[] = '        "' . $dir . '": ROOMDIR + "' . $targetFileNoExt . '"';
     }
     $exitBlock = empty($exitStrs) ? '' : "    set_exits(([\n" . implode(",\n", $exitStrs) . "\n    ]));\n";
 
@@ -192,7 +193,7 @@ void create()
 $itemBlock$exitBlock$monsterLines}
 C;
 
-    file_put_contents("$baseDir/rooms/$fileName", $roomCode);
+    file_put_contents("$baseDir/rooms/$fileName" . ".c", $roomCode);
 }
 
 // Create zip

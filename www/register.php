@@ -12,7 +12,8 @@
 
   <style>
     body {
-      background: url('https://www.transparenttextures.com/patterns/aged-paper.png') repeat;
+      background: url('assets/background.svg') no-repeat center center;
+      background-size: cover;
       font-family: 'Georgia', serif;
       color: #3e2f1c;
       height: 100vh;
@@ -68,7 +69,7 @@
 <body>
 
 <div class="parchment-box">
-  <h2>Register Thyself</h2>
+  <h2>Create Account</h2>
   <form id="registerForm">
     <div class="mb-3">
       <label class="form-label">Username</label>
