@@ -198,7 +198,8 @@ function saveRoom() {
     set_smell: document.getElementById('set_smell').value,
     set_items: getItems(),
     exits: grid[key(currentX, currentY, currentZ)]?.exits || {},
-    monsters: getMonsters()
+    monsters: getMonsters(),
+    objects: getObjects()
   };
   grid[key(currentX, currentY, currentZ)] = room;
   drawMap();
@@ -297,6 +298,18 @@ function loadRoom() {
       addMonsterRow(monsterID);
     });
   }
+
+  // Clear existing object inputs
+  const objectContainer = document.getElementById('objectContainer');
+  objectContainer.innerHTML = '';
+
+  // Load each object ID (if any)
+  if (Array.isArray(room.objects)) {
+    room.objects.forEach(objectID => {
+      addObjectRow(objectID);
+    });
+  }
+
 }
 
 function addItemRow(name = '', description = '') {
@@ -545,7 +558,7 @@ function showRoomMenu(roomKey, tileX, tileY) {
 
   menu.innerHTML = `
     <strong>Room:</strong> ${roomKey}<br>
-    <button onclick="editRoom('${roomKey}')">Edit</button>
+    <button onclick="saveRoom();editRoom('${roomKey}')">Edit</button>
     <button onclick="deleteRoom('${roomKey}')">Delete</button>
   `;
 
@@ -554,21 +567,6 @@ function showRoomMenu(roomKey, tileX, tileY) {
   menu.style.display = 'block';
 }
 
-
-function showRoomMenu2(roomKey, x, y) {
-  const menu = document.getElementById('roomMenu');
-  const room = grid[roomKey];
-
-  menu.innerHTML = `
-    <strong>Room:</strong> ${roomKey}<br>
-    <button onclick="editRoom('${roomKey}')">Edit</button>
-    <button onclick="deleteRoom('${roomKey}')">Delete</button>
-  `;
-
-  menu.style.left = `${x}px`;
-  menu.style.top = `${y}px`;
-  menu.style.display = 'block';
-}
 
 function editRoom(roomKey) {
   const [x, y, z] = roomKey.split(',').map(Number);
@@ -800,6 +798,69 @@ function getMonsters() {
   });
 
   return ids;
+}
+
+function getObjects() {
+  const selects = document.querySelectorAll('#objectContainer select');
+  const ids = [];
+
+  selects.forEach(select => {
+    const id = parseInt(select.value);
+    if (!isNaN(id)) ids.push(id);
+  });
+
+  return ids;
+}
+
+function addObjectRow(selectedId = '') {
+  const container = document.getElementById('objectContainer');
+
+  const row = document.createElement('div');
+  row.classList.add('object-row');
+  row.style.marginBottom = '6px';
+
+  const select = document.createElement('select');
+  select.name = 'object_id[]';
+
+  // Default placeholder
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = '-- Select a object --';
+  select.appendChild(placeholder);
+
+  // Fetch objects via AJAX
+  fetch('get_objects.php')
+    .then(response => response.json())
+    .then(data => {
+      data.forEach(object => {
+        const option = document.createElement('option');
+        option.value = object.id;
+        option.textContent = object.id + ' ' + object.short  + ' (' + object.class + ')' || '(no name)';
+        select.appendChild(option);
+      });
+      // Set default selected after options are loaded
+      if (selectedId) {
+        select.value = selectedId.toString();
+      }
+    })
+    .catch(err => {
+      console.error('Error fetching objects:', err);
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'Error loading objects';
+      select.appendChild(option);
+    });
+
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.textContent = '-';
+  removeBtn.addEventListener('click', () => {
+    row.remove();
+  });
+
+  row.appendChild(select);
+  row.appendChild(removeBtn);
+  container.appendChild(row);
 }
 
 

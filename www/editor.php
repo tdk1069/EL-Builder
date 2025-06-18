@@ -106,11 +106,6 @@ $roomJson = $roomRow ? $roomRow->data : null;
 </div>
 
   </div> <!-- end of Basic Tab -->
-  <div id="tab-objects" class="tab-content" style="display: none;">
-    <!-- Your dynamic item UI -->
-  </div>
-
-
 <!-- Save and Back buttons -->
 <div class="save-controls" style="margin-top: 10px;">
   <button onclick="saveAreaToDb()">Save Area to Database</button>
@@ -120,13 +115,18 @@ $roomJson = $roomRow ? $roomRow->data : null;
 <div id="saveStatus" style="margin-top: 8px; font-weight: bold;"></div>
       </div>
     </div>
-  <div id="tab-monsters" class="tab-content" style="display: none;">
-    <!-- Monster assignment UI (dropdown + list of assigned monsters) -->
-Hi?
-<div id="monsterContainer"></div>
-<button type="button" onclick="addMonsterRow()">+ Add Monster</button>
-
+    <div id="tab-monsters" class="tab-content" style="display: none;">
+      <!-- Monster assignment UI (dropdown + list of assigned monsters) -->
+      <div id="monsterContainer"></div>
+      <button type="button" onclick="addMonsterRow()">+ Add Monster</button>
+    </div>
+  <div id="tab-objects" class="tab-content" style="display: none;">
+      <!-- Object assignment UI (dropdown + list of assigned Objects-->
+      <div id="objectContainer"></div>
+      <button type="button" onclick="addObjectRow()">+ Add Object</button>
   </div>
+
+
   </div>
 
   <script src="compromise.js"></script>

@@ -14,11 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
     if ($action === 'add') {
-      $stmt = $pdo->prepare("INSERT INTO obj (owner, class, short, longdesc, level) VALUES (?, ?, ?, ?, ?)");
-      $stmt->execute([$username, $_POST['class'], $_POST['short'], $_POST['longdesc'], $_POST['level']]);
+      $stmt = $pdo->prepare("INSERT INTO obj (owner, class, short, name, longdesc, level) VALUES (?, ?, ?, ?, ?, ?)");
+      $stmt->execute([$username, $_POST['class'], $_POST['short'], $_POST['name'], $_POST['longdesc'], $_POST['level']]);
     } elseif ($action === 'update' && isset($_POST['id'])) {
-      $stmt = $pdo->prepare("UPDATE obj SET class=?, short=?, longdesc=? ,level=? WHERE id=? AND owner=?");
-      $stmt->execute([$_POST['class'], $_POST['short'], $_POST['longdesc'], $_POST['level'], $_POST['id'], $username]);
+      $stmt = $pdo->prepare("UPDATE obj SET class=?, short=?, name=?, longdesc=? ,level=? WHERE id=? AND owner=?");
+      $stmt->execute([$_POST['class'], $_POST['short'], $_POST['name'], $_POST['longdesc'], $_POST['level'], $_POST['id'], $username]);
     } elseif ($action === 'delete' && isset($_POST['id'])) {
       $stmt = $pdo->prepare("DELETE FROM obj WHERE id=? AND owner=?");
       $stmt->execute([$_POST['id'], $username]);
@@ -132,7 +132,7 @@ $objects = $stmt->fetchAll();
       <select name="class" id="classSelect" required onchange="fillExample()">
         <option value="">-- Select --</option>
         <?php
-        $classes = ['Blade','Blunt','Knife','Polearm','Projectile','Staff','Thrown','Two-Handed','Whip','Amulet','Cloak','Ring','Shield','Cloth Head','Cloth Torso','Cloth Hands','Cloth Feet','Leather Head','Leather Torso','Leather Hands','Leather Feet','Mail Head','Mail Torso','Mail Hands','Mail Feet','Plate Head','Plate Torso','Plate Hands','Plate Feet'];
+        $classes = ['Blade','Blunt','Knife','Polearm','Projectile','Staff','Thrown','Two Handed','Whip','Amulet','Cloak','Ring','Shield','Cloth Head','Cloth Torso','Cloth Hands','Cloth Feet','Leather Head','Leather Torso','Leather Hands','Leather Feet','Mail Head','Mail Torso','Mail Hands','Mail Feet','Plate Head','Plate Torso','Plate Hands','Plate Feet'];
         foreach ($classes as $class) {
           echo "<option value=\"$class\">$class</option>";
         }
@@ -146,6 +146,10 @@ $objects = $stmt->fetchAll();
 
     <label>Short Description:
       <input type="text" name="short" id="shortInput" required>
+    </label><br><br>
+
+    <label>Name:
+      <input type="text" name="name" id="nameInput" required>
     </label><br><br>
 
     <label>Long Description:
@@ -163,6 +167,7 @@ $objects = $stmt->fetchAll();
       <th>ID</th>
       <th>Class</th>
       <th>Short</th>
+      <th>Name</th>
       <th>Long</th>
       <th>Level</th>
       <th>Actions</th>
@@ -183,6 +188,7 @@ $objects = $stmt->fetchAll();
           </select>
         </td>
         <td><input type="text" name="short" value="<?= htmlspecialchars($obj->short) ?>"></td>
+        <td><input type="text" name="name" value="<?= htmlspecialchars($obj->name) ?>"></td>
         <td><textarea name="longdesc" rows="2"><?= htmlspecialchars($obj->longdesc) ?></textarea></td>
         <td><input type="number" name="level" value="<?= htmlspecialchars($obj->level) ?>"></td>
         <td>
@@ -202,120 +208,120 @@ $objects = $stmt->fetchAll();
 <script>
 const examples = {
   Blade: [
-    { short: "a gleaming longsword", long: "This longsword has a finely honed edge and a jewel-encrusted hilt.", level: 10 },
-    { short: "a curved scimitar", long: "The blade of this scimitar glints wickedly in the light.", level: 7 }
+    { short: "a gleaming longsword", name: "longsword", long: "This longsword has a finely honed edge and a jewel-encrusted hilt.", level: 10 },
+    { short: "a curved scimitar", name: "scimitar", long: "The blade of this scimitar glints wickedly in the light.", level: 7 }
   ],
   Blunt: [
-    { short: "a heavy iron mace", long: "The mace has a spiked head and a thick shaft perfect for crushing.", level: 9 },
-    { short: "a polished warhammer", long: "The warhammer's head gleams with recent use, its balance nearly perfect.", level: 12 }
+    { short: "a heavy iron mace", name: "mace", long: "The mace has a spiked head and a thick shaft perfect for crushing.", level: 9 },
+    { short: "a polished warhammer", name: "warhammer", long: "The warhammer's head gleams with recent use, its balance nearly perfect.", level: 12 }
   ],
   Knife: [
-    { short: "a bone-handled dagger", long: "This dagger is small but deadly, with a bone grip and silver blade.", level: 5 },
-    { short: "a serrated dirk", long: "A short stabbing weapon with jagged edges ideal for close encounters.", level: 6 }
+    { short: "a bone-handled dagger", name: "dagger", long: "This dagger is small but deadly, with a bone grip and silver blade.", level: 5 },
+    { short: "a serrated dirk", name: "dirk", long: "A short stabbing weapon with jagged edges ideal for close encounters.", level: 6 }
   ],
   Polearm: [
-    { short: "a steel-tipped halberd", long: "This halberd combines an axe blade with a sharp spear tip.", level: 11 },
-    { short: "a long wooden spear", long: "A sturdy shaft topped with a leaf-shaped metal tip.", level: 6 }
+    { short: "a steel-tipped halberd", name: "halbred", long: "This halberd combines an axe blade with a sharp spear tip.", level: 11 },
+    { short: "a long wooden spear", name: "spear", long: "A sturdy shaft topped with a leaf-shaped metal tip.", level: 6 }
   ],
   Projectile: [
-    { short: "a yew shortbow", long: "Crafted from seasoned yew, this shortbow is light and fast.", level: 5 },
-    { short: "a heavy crossbow", long: "This crossbow packs a punch and is reinforced with iron.", level: 10 }
+    { short: "a yew shortbow", name: "shortbow", long: "Crafted from seasoned yew, this shortbow is light and fast.", level: 5 },
+    { short: "a heavy crossbow", name: "crossbow", long: "This crossbow packs a punch and is reinforced with iron.", level: 10 }
   ],
   Staff: [
-    { short: "an oak wizard's staff", long: "A runed staff topped with a crystal that glows faintly.", level: 8 },
-    { short: "a charred wooden staff", long: "Scorch marks run along its shaft, hinting at fire magic.", level: 6 }
+    { short: "an oak wizard's staff", name: "staff", long: "A runed staff topped with a crystal that glows faintly.", level: 8 },
+    { short: "a charred wooden staff", name: "staff", long: "Scorch marks run along its shaft, hinting at fire magic.", level: 6 }
   ],
   Thrown: [
-    { short: "a throwing axe", long: "Small and well-balanced for long-distance combat.", level: 4 },
-    { short: "a set of steel throwing knives", long: "Slim blades designed for silent takedowns.", level: 5 }
+    { short: "a throwing axe", name: "axe", long: "Small and well-balanced for long-distance combat.", level: 4 },
+    { short: "a set of steel throwing knives", name: "knives", long: "Slim blades designed for silent takedowns.", level: 5 }
   ],
-  "Two-Handed": [
-    { short: "a massive claymore", long: "This two-handed sword requires immense strength to wield.", level: 13 },
-    { short: "a brutal great axe", long: "Double-bladed and fearsome, it cleaves through armor with ease.", level: 12 }
+  "Two Handed": [
+    { short: "a massive claymore", name: "claymore", long: "This two-handed sword requires immense strength to wield.", level: 13 },
+    { short: "a brutal great axe", name: "axe", long: "Double-bladed and fearsome, it cleaves through armor with ease.", level: 12 }
   ],
   Whip: [
-    { short: "a barbed leather whip", long: "Studded with small hooks for extra sting.", level: 7 },
-    { short: "a snakebone lash", long: "This whip is crafted from vertebrae and crackles with energy.", level: 9 }
+    { short: "a barbed leather whip", name: "whip", long: "Studded with small hooks for extra sting.", level: 7 },
+    { short: "a snakebone lash", name: "lash", long: "This whip is crafted from vertebrae and crackles with energy.", level: 9 }
   ],
   Amulet: [
-    { short: "an amulet of protection", long: "This silver charm glows faintly and wards off harm.", level: 5 },
-    { short: "a sapphire pendant", long: "A deep-blue gem hangs from a golden chain, calming the mind.", level: 7 }
+    { short: "an amulet of protection", name: "amulet", long: "This silver charm glows faintly and wards off harm.", level: 5 },
+    { short: "a sapphire pendant", name: "pendant", long: "A deep-blue gem hangs from a golden chain, calming the mind.", level: 7 }
   ],
   Cloak: [
-    { short: "a midnight cloak", long: "Dark as night, this cloak helps the wearer fade from view.", level: 6 },
-    { short: "a weathered traveler's cape", long: "Stitched with many repairs, it has clearly seen long journeys.", level: 3 }
+    { short: "a midnight cloak", name: "cloak", long: "Dark as night, this cloak helps the wearer fade from view.", level: 6 },
+    { short: "a weathered traveler's cape", name: "cape", long: "Stitched with many repairs, it has clearly seen long journeys.", level: 3 }
   ],
   Ring: [
-    { short: "a ring of agility", long: "This slim band improves the wearer’s reflexes.", level: 6 },
-    { short: "a fire-etched ring", long: "Warm to the touch, this ring channels inner flame.", level: 8 }
+    { short: "a ring of agility", name: "ring", long: "This slim band improves the wearer’s reflexes.", level: 6 },
+    { short: "a fire-etched ring", name: "ring", long: "Warm to the touch, this ring channels inner flame.", level: 8 }
   ],
   Shield: [
-    { short: "an iron buckler", long: "Small and light, ideal for quick parries.", level: 5 },
-    { short: "a tower shield", long: "This massive shield covers the user from shoulder to shin.", level: 12 }
+    { short: "an iron buckler", name: "buckler", long: "Small and light, ideal for quick parries.", level: 5 },
+    { short: "a tower shield", name: "shield", long: "This massive shield covers the user from shoulder to shin.", level: 12 }
   ],
   "Cloth Head": [
-    { short: "a tattered wizard hat", long: "A pointed hat sagging at the tip, patched with stars.", level: 2 },
-    { short: "a silk skullcap", long: "Smooth and embroidered with tiny golden runes.", level: 4 }
+    { short: "a tattered wizard hat", name: "hat", long: "A pointed hat sagging at the tip, patched with stars.", level: 2 },
+    { short: "a silk skullcap", name: "cap", long: "Smooth and embroidered with tiny golden runes.", level: 4 }
   ],
   "Cloth Torso": [
-    { short: "a novice's robe", long: "A simple robe with a rope belt and no flair.", level: 1 },
-    { short: "a mystic's vestments", long: "Robes dyed in deep purple, decorated with arcane symbols.", level: 7 }
+    { short: "a novice's robe", name: "robe", long: "A simple robe with a rope belt and no flair.", level: 1 },
+    { short: "a mystic's vestments", name: "vestments", long: "Robes dyed in deep purple, decorated with arcane symbols.", level: 7 }
   ],
   "Cloth Hands": [
-    { short: "a pair of linen gloves", long: "Thin gloves for dexterous fingerwork, not battle.", level: 2 },
-    { short: "embroidered mage gloves", long: "These gloves shimmer faintly and crackle with latent magic.", level: 5 }
+    { short: "a pair of linen gloves", name: "gloves", long: "Thin gloves for dexterous fingerwork, not battle.", level: 2 },
+    { short: "embroidered mage gloves", name: "gloves", long: "These gloves shimmer faintly and crackle with latent magic.", level: 5 }
   ],
   "Cloth Feet": [
-    { short: "a pair of soft slippers", long: "Comfortable and nearly silent on stone floors.", level: 1 },
-    { short: "glowing thread boots", long: "These fine boots hum with residual energy.", level: 6 }
+    { short: "a pair of soft slippers", name: "slippers", long: "Comfortable and nearly silent on stone floors.", level: 1 },
+    { short: "glowing thread boots", name: "boots", long: "These fine boots hum with residual energy.", level: 6 }
   ],
   "Leather Head": [
-    { short: "a leather hood", long: "Dark and snug, perfect for a rogue.", level: 3 },
-    { short: "a reinforced leather helm", long: "Provides light protection without sacrificing mobility.", level: 5 }
+    { short: "a leather hood", name: "hood", long: "Dark and snug, perfect for a rogue.", level: 3 },
+    { short: "a reinforced leather helm", name: "helm", long: "Provides light protection without sacrificing mobility.", level: 5 }
   ],
   "Leather Torso": [
-    { short: "a studded leather jerkin", long: "Reinforced with rivets, it's lightweight but tough.", level: 6 },
-    { short: "a hunter’s vest", long: "Smells faintly of the forest, adorned with fur trims.", level: 4 }
+    { short: "a studded leather jerkin", name: "jerkin", long: "Reinforced with rivets, it's lightweight but tough.", level: 6 },
+    { short: "a hunter’s vest", name: "vest", long: "Smells faintly of the forest, adorned with fur trims.", level: 4 }
   ],
   "Leather Hands": [
-    { short: "archer’s gloves", long: "These gloves are flexible with padded palms.", level: 4 },
-    { short: "spiked leather gloves", long: "The knuckles are reinforced with short spikes.", level: 7 }
+    { short: "archer’s gloves", name: "gloves", long: "These gloves are flexible with padded palms.", level: 4 },
+    { short: "spiked leather gloves", name: "gloves", long: "The knuckles are reinforced with short spikes.", level: 7 }
   ],
   "Leather Feet": [
-    { short: "a pair of ranger boots", long: "Perfect for hiking quietly through brush and grass.", level: 4 },
-    { short: "shadowstep boots", long: "Each step feels lighter, quieter, quicker.", level: 7 }
+    { short: "a pair of ranger boots", name: "boots", long: "Perfect for hiking quietly through brush and grass.", level: 4 },
+    { short: "shadowstep boots", name: "boots", long: "Each step feels lighter, quieter, quicker.", level: 7 }
   ],
   "Mail Head": [
-    { short: "a chainmail coif", long: "Woven metal rings protect the head and neck.", level: 6 },
-    { short: "a rusted mail helm", long: "Old but sturdy, passed down through generations.", level: 5 }
+    { short: "a chainmail coif", name: "coif", long: "Woven metal rings protect the head and neck.", level: 6 },
+    { short: "a rusted mail helm", name: "helm", long: "Old but sturdy, passed down through generations.", level: 5 }
   ],
   "Mail Torso": [
-    { short: "a chainmail vest", long: "Flexible torso protection of fine dwarven links.", level: 7 },
-    { short: "an engraved mail shirt", long: "Each ring is etched with a protective rune.", level: 9 }
+    { short: "a chainmail vest", name: "vest", long: "Flexible torso protection of fine dwarven links.", level: 7 },
+    { short: "an engraved mail shirt", name: "shirt", long: "Each ring is etched with a protective rune.", level: 9 }
   ],
   "Mail Hands": [
-    { short: "mail-backed gloves", long: "Padded leather gloves reinforced with chain links.", level: 6 },
-    { short: "gauntlets of interwoven mail", long: "Crafted for grip and defense alike.", level: 8 }
+    { short: "mail-backed gloves", name: "gloves", long: "Padded leather gloves reinforced with chain links.", level: 6 },
+    { short: "gauntlets of interwoven mail", name: "mail", long: "Crafted for grip and defense alike.", level: 8 }
   ],
   "Mail Feet": [
-    { short: "heavy mail boots", long: "Clank with every step but protect like stone.", level: 8 },
-    { short: "scaled greaves", long: "Layered with fish-scale metal for extra defense.", level: 9 }
+    { short: "heavy mail boots", name: "boots", long: "Clank with every step but protect like stone.", level: 8 },
+    { short: "scaled greaves", name: "greaves", long: "Layered with fish-scale metal for extra defense.", level: 9 }
   ],
   "Plate Head": [
-    { short: "a steel greathelm", long: "Completely encases the head in iron and intimidation.", level: 10 },
-    { short: "a crested helm", long: "Decorative yet battle-ready, with a crimson plume.", level: 11 }
+    { short: "a steel greathelm", name: "helm", long: "Completely encases the head in iron and intimidation.", level: 10 },
+    { short: "a crested helm", name: "helm", long: "Decorative yet battle-ready, with a crimson plume.", level: 11 }
   ],
   "Plate Torso": [
-    { short: "a paladin's breastplate", long: "Holy symbols are etched into this radiant armor.", level: 12 },
-    { short: "a blackened cuirass", long: "Worn by dark knights, it absorbs the light around it.", level: 13 }
+    { short: "a paladin's breastplate", name: "breastplate", long: "Holy symbols are etched into this radiant armor.", level: 12 },
+    { short: "a blackened cuirass", name: "cuirass", long: "Worn by dark knights, it absorbs the light around it.", level: 13 }
   ],
   "Plate Hands": [
-    { short: "spiked gauntlets", long: "Formidable metal gloves that double as weapons.", level: 11 },
-    { short: "engraved plate gloves", long: "Covered in swirling patterns and battle-tested dents.", level: 10 }
+    { short: "spiked gauntlets", name: "gauntlets", long: "Formidable metal gloves that double as weapons.", level: 11 },
+    { short: "engraved plate gloves", name: "gloves", long: "Covered in swirling patterns and battle-tested dents.", level: 10 }
   ],
   "Plate Feet": [
-    { short: "iron sabatons", long: "Boots that thunder with every step.", level: 10 },
-    { short: "gilded footguards", long: "Elegant and deadly, these plate boots gleam with pride.", level: 12 }
+    { short: "iron sabatons", name: "sabatons", long: "Boots that thunder with every step.", level: 10 },
+    { short: "gilded footguards", name: "footguards", long: "Elegant and deadly, these plate boots gleam with pride.", level: 12 }
   ]
 };
 
