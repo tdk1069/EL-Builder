@@ -62,9 +62,34 @@ $genders = ['Male', 'Female', 'Unknown'];
 <head>
 <?php include 'header.php'; ?>
   <title>Your Monsters</title>
+  <link rel="icon" href="/assets/background.svg" type="image/svg+xml">
   <!-- Fancy font -->
   <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
 <style>
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+  .hidden {
+    display: none;
+  }
+
   body {
     background: url('assets/background.svg') no-repeat center center;
     background-size: cover;
@@ -269,39 +294,133 @@ $genders = ['Male', 'Female', 'Unknown'];
         <input type="hidden" name="action" value="delete">
         <button class="btn" type="submit" style="background:#c33;">Delete</button>
       </form>
-        </td>
+      <!-- New Items button -->
+      <button type="button" class="btn" onclick="openItemModal(<?= $monster->id ?>)">Items</button>
+      </td> 
+      </td>
     </tr>
     <?php endforeach; ?>
   </tbody>
 </table>
 
-  <script src="examples.js"></script>
+<!-- Monster Item Modal -->
+<div id="itemModal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <h2>Monster Items</h2>
+
+    <select id="itemSelector">
+      <option value="">-- Select item to add --</option>
+    </select>
+    <button onclick="addItemToMonster()">Add</button>
+
+    <ul id="selectedItemsList"></ul>
+
+    <button onclick="saveMonsterItems()">Save</button>
+    <button onclick="closeItemModal()">Close</button>
+  </div>
+</div>
+
+<script src="examples.js"></script>
 <script>
+let availableItems = [];
+let selectedItems = [];
+let currentMonsterId = null;
 
-function fillExample() {
-  const classType = document.getElementById('classSelect').value;
-  const shortInput = document.getElementById('shortInput');
-  const longdescInput = document.getElementById('longdescInput');
-  const levelInput = document.getElementById('levelInput');
-  const raceSelect = document.getElementById('raceSelect');
-  const genderSelect = document.getElementById('genderSelect');
+async function openItemModal(monsterId) {
+  currentMonsterId = monsterId;
+  document.getElementById('itemModal').classList.remove('hidden');
 
-  if (exampleMonsters[classType]) {
-    const random = exampleMonsters[classType][Math.floor(Math.random() * exampleMonsters[classType].length)];
+  // Load available items (objects)
+  const res = await fetch('/get_objects.php');
+  availableItems = await res.json();
 
-    shortInput.value = random.set_short || '';
-    nameInput.value = random.set_name || '';
-    longdescInput.value = random.set_long || '';
-    levelInput.value = random.set_level || '';
-    raceSelect.value = random.set_race || '';
-    genderSelect.value = random.set_gender || '';
-  } else {
-    shortInput.value = '';
-    longdescInput.value = '';
-    levelInput.value = '';
-    raceSelect.value = '';
-    genderSelect.value = '';
+  // Populate dropdown
+  const selector = document.getElementById('itemSelector');
+  selector.innerHTML = '<option value="">-- Select item to add --</option>';
+  availableItems.forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item.id;
+    opt.textContent = `${item.short} (Lvl ${item.level})`;
+    selector.appendChild(opt);
+  });
+
+  // Load assigned items for this monster
+  const assignedRes = await fetch(`/monster_items.php?monster_id=${monsterId}`);
+  const assignedIds = await assignedRes.json();
+
+  // Pre-populate selectedItems by matching IDs with availableItems
+  selectedItems = availableItems.filter(item => assignedIds.includes(item.id));
+
+  updateSelectedItemsUI();
+}
+
+function addItemToMonster() {
+  const selector = document.getElementById('itemSelector');
+  const selectedId = parseInt(selector.value);
+  if (!selectedId) return;
+
+  if (selectedItems.find(i => i.id === selectedId)) return; // already added
+
+  const item = availableItems.find(i => i.id === selectedId);
+  if (!item) return;
+
+  selectedItems.push(item);
+  updateSelectedItemsUI();
+}
+
+function removeItem(itemId) {
+  selectedItems = selectedItems.filter(i => i.id !== itemId);
+  updateSelectedItemsUI();
+}
+
+function updateSelectedItemsUI() {
+  const list = document.getElementById('selectedItemsList');
+  list.innerHTML = '';
+
+  selectedItems.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = `${item.short} (Lvl ${item.level})`;
+
+    const btn = document.createElement('button');
+    btn.textContent = '-';
+    btn.style.marginLeft = '1em';
+    btn.onclick = () => removeItem(item.id);
+
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+}
+
+async function saveMonsterItems() {
+  if (!currentMonsterId) return;
+
+  const idsToSave = selectedItems.map(i => i.id);
+
+  try {
+    const res = await fetch('/monster_items.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        monster_id: currentMonsterId,
+        items: idsToSave
+      })
+    });
+
+    const json = await res.json();
+
+    if (json.success) {
+      console.log('Items saved successfully!');
+      closeItemModal();
+    } else {
+      console.log('Error saving items: ' + (json.error || 'unknown error'));
+    }
+  } catch (e) {
+    console.log('Request failed: ' + e.message);
   }
+}
+
+function closeItemModal() {
+  document.getElementById('itemModal').classList.add('hidden');
 }
 </script>
 

@@ -21,6 +21,7 @@ $areas = $stmt->fetchAll();
 <head>
   <meta charset="UTF-8">
   <title>MUD Area Dashboard</title>
+  <link rel="icon" href="/assets/background.svg" type="image/svg+xml">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap -->

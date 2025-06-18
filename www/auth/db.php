@@ -89,13 +89,12 @@ $tables = [
         )
     ",
 
-    "MonsterRooms" => "
-        CREATE TABLE IF NOT EXISTS MonsterRooms (
+    "monsterObj" => "
+        CREATE TABLE IF NOT EXISTS monsterObj (
+            id INT(11) NOT NULL AUTO_INCREMENT,
             monster_id INT(11) NOT NULL,
-            room_id INT(11) NOT NULL,
-            area_id INT(11),
-            PRIMARY KEY (monster_id, room_id),
-            KEY (area_id)
+            object_id INT(11) NOT NULL,
+            PRIMARY KEY (id)
         )
     "
 ];

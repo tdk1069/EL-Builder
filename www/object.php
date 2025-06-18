@@ -36,6 +36,7 @@ $objects = $stmt->fetchAll();
 <html>
 <head>
   <title>Your Objects</title>
+  <link rel="icon" href="/assets/background.svg" type="image/svg+xml">
   <!-- Fancy font -->
   <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
 <style>

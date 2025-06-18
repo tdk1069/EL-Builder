@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>MUD Area Builder - Login</title>
+  <link rel="icon" href="/assets/background.svg" type="image/svg+xml">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap 5 -->
