@@ -388,37 +388,18 @@ function drawMap() {
     }
   }
 
-for (const k in grid) {
-  const [x, y, z] = k.split(',').map(Number);
-  if (z !== currentZ) continue;
+  for (const k in grid) {
+    const [x, y, z] = k.split(',').map(Number);
+    if (z !== currentZ) continue;
 
-  const px = centerX + (x - currentX) * ROOM_SPACING;
-  const py = centerY + (y - currentY) * ROOM_SPACING;
+    const px = centerX + (x - currentX) * ROOM_SPACING;
+    const py = centerY + (y - currentY) * ROOM_SPACING;
 
-  const room = grid[k];
-
-  // Draw room square
-  ctx.fillStyle = (x === currentX && y === currentY) ? '#3a6' : '#555';
-  ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-  ctx.strokeStyle = '#aaa';
-  ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
-
-  // Draw up/down indicators
-ctx.font = '12px sans-serif';
-ctx.textAlign = 'center';
-ctx.textBaseline = 'middle';
-
-if (room.exits['up']) {
-  ctx.fillStyle = '#6cf'; // light blue
-  ctx.fillText('↑', px + TILE_SIZE + 8, py + TILE_SIZE / 2 - 8);
-}
-
-if (room.exits['down']) {
-  ctx.fillStyle = '#ffffcc';
-  ctx.fillText('↓', px + TILE_SIZE + 8, py + TILE_SIZE / 2 + 8);
-}
-
-}
+    ctx.fillStyle = (x === currentX && y === currentY) ? '#3a6' : '#555';
+    ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+    ctx.strokeStyle = '#aaa';
+    ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+  }
 }
 
 function downloadArea() {
