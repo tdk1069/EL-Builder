@@ -55,15 +55,6 @@ foreach ($grid as $room) {
     }
 }
 
-$monsterMap = [];
-foreach ($monsters as $monster) {
-    if (!isset($usedMonsterIds[$monster['id']])) continue; // Only include used monsters
-
-    $short = $monster['set_short'] ?? 'monster';
-    $filename = strtolower(preg_replace('/[^a-z0-9_]+/', '_', $short));
-    $monsterMap[$monster['id']] = $filename;
-}
-
 if (!$roomRow) {
     die('No rooms found for this area.');
 }
@@ -75,6 +66,55 @@ $baseLevel = $area->levelRange;
 $coordToFile = [];
 $existingNames = [];
 
+$usedObjectIds = [];
+
+foreach ($grid as $room) {
+    if (!empty($room['objects'])) {
+        foreach ($room['objects'] as $objectId) {
+            $usedObjectIds[] = (int)$objectId;
+        }
+    }
+}
+
+foreach ($monsterItems as $mi) {
+    $usedObjectIds[] = (int)$mi['object_id'];
+}
+
+$usedObjectIds = array_unique($usedObjectIds);
+
+$objectMap = [];
+$objects = array_filter($obj, function ($o) use ($usedObjectIds) {
+    return in_array((int)$o['id'], $usedObjectIds);
+});
+
+$monsterMap = [];
+foreach ($monsters as $monster) {
+    if (!isset($usedMonsterIds[$monster['id']])) continue; // Only include used monsters
+
+    $short = $monster['set_short'] ?? 'monster';
+    $filename = strtolower(preg_replace('/[^a-z0-9_]+/', '_', $short));
+    $monsterMap[$monster['id']] = $filename;
+}
+
+foreach ($objects as $o) {
+    $short = $o['short'] ?? 'item';
+    $filename = strtolower(preg_replace('/[^a-z0-9_]+/', '_', $short));
+    $objectMap[$o['id']] = $filename;
+}
+
+// Build mapping from monster_id to array of object filenames
+$monsterItemMap = [];
+
+foreach ($monsterItems as $mi) {
+    $monster_id = $mi['monster_id'];
+    $object_id = $mi['object_id'];
+    if (!isset($monsterItemMap[$monster_id])) {
+        $monsterItemMap[$monster_id] = [];
+    }
+    if (isset($objectMap[$object_id])) {
+        $monsterItemMap[$monster_id][] = $objectMap[$object_id]; // store filename without extension
+    }
+}
 
 
 function makeSafeFileName($short) {
@@ -128,23 +168,6 @@ $monsterDir = "$baseDir/mon";
 if (!is_dir($monsterDir)) {
     mkdir($monsterDir, 0755, true);
 }
-
-$usedObjectIds = [];
-
-foreach ($grid as $room) {
-    if (!empty($room['objects'])) {
-        foreach ($room['objects'] as $objectId) {
-            $usedObjectIds[] = (int)$objectId;
-        }
-    }
-}
-
-$usedObjectIds = array_unique($usedObjectIds);
-
-$objectMap = [];
-$objects = array_filter($obj, function ($o) use ($usedObjectIds) {
-    return in_array((int)$o['id'], $usedObjectIds);
-});
 
 $objectDir = "$baseDir/obj";
 if (!is_dir($objectDir)) {
@@ -285,19 +308,6 @@ C;
     file_put_contents("$baseDir/rooms/$fileName" . ".c", $roomCode);
 }
 
-// Build mapping from monster_id to array of object filenames
-$monsterItemMap = [];
-foreach ($monsterItems as $mi) {
-    $monster_id = $mi['monster_id'];
-    $object_id = $mi['object_id'];
-    if (!isset($monsterItemMap[$monster_id])) {
-        $monsterItemMap[$monster_id] = [];
-    }
-    if (isset($objectMap[$object_id])) {
-        $monsterItemMap[$monster_id][] = $objectMap[$object_id]; // store filename without extension
-    }
-}
-
 foreach ($monsters as $monster) {
     if (!isset($usedMonsterIds[$monster['id']])) continue;
 
@@ -315,7 +325,6 @@ foreach ($monsters as $monster) {
 
     // Build the add_object lines
     $addObjectCode = '';
-var_dump($monsterItemMap);
     if (!empty($monsterItemMap[$monster['id']])) {
         foreach ($monsterItemMap[$monster['id']] as $objFilename) {
             $addObjectCode .= "\n    add_object(OBDIR+\"$objFilename\");";
