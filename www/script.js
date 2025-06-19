@@ -459,38 +459,49 @@ function uploadArea(event) {
   reader.readAsText(file);
 }
 
-function saveAreaToDb() {
-  const areaData = {
-    grid: grid,
-    currentX: currentX,
-    currentY: currentY,
-    currentZ: currentZ
-  };
+function saveAreaToDb(callback) {
+    const areaData = {
+        grid: grid,
+        currentX: currentX,
+        currentY: currentY,
+        currentZ: currentZ
+    };
 
-  fetch('save_area.php?id=' + areaId, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(areaData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    const statusDiv = document.getElementById('saveStatus');
-    if(data.success) {
-      statusDiv.textContent = "Area saved successfully!";
-      statusDiv.style.color = "green";
-    } else {
-      statusDiv.textContent = "Error saving area: " + data.error;
-      statusDiv.style.color = "red";
-    }
-  })
-  .catch(err => {
-    const statusDiv = document.getElementById('saveStatus');
-    statusDiv.textContent = "Network error: " + err.message;
-    statusDiv.style.color = "red";
-  });
+    fetch('save_area.php?id=' + areaId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(areaData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        const statusDiv = document.getElementById('saveStatus');
+        if (data.success) {
+            statusDiv.textContent = "Area saved successfully!";
+            statusDiv.style.color = "green";
+            if (callback) callback(); // Call the callback after successful save
+        } else {
+            statusDiv.textContent = "Error saving area: " + data.error;
+            statusDiv.style.color = "red";
+        }
+        setTimeout(() => statusDiv.textContent = '', 3000);
+    })
+    .catch(err => {
+        const statusDiv = document.getElementById('saveStatus');
+        statusDiv.textContent = "Network error: " + err.message;
+        statusDiv.style.color = "red";
+        setTimeout(() => statusDiv.textContent = '', 3000);
+    });
 }
+
+// Handle back button with autosave
+document.getElementById('backToDashboard').addEventListener('click', function(event) {
+    event.preventDefault(); // Stop immediate navigation
+    saveAreaToDb(() => {
+        window.location.href = 'dashboard.php'; // Redirect after save
+    });
+});
 
 const itemsContainer = document.getElementById('itemsContainer');
 const addItemBtn = document.getElementById('addItemBtn');

@@ -110,7 +110,8 @@ $roomJson = $roomRow ? $roomRow->data : null;
 <!-- Save and Back buttons -->
 <div class="save-controls" style="margin-top: 10px;">
   <button onclick="saveAreaToDb()">Save Area to Database</button>
-  <a href="dashboard.php" class="back-button">Back to Dashboard</a>
+  <a href="dashboard.php" id="backToDashboard" class="back-button">Back to Dashboard</a>
+
 </div>
 
 <div id="saveStatus" style="margin-top: 8px; font-weight: bold;"></div>

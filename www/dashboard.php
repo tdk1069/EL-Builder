@@ -122,11 +122,11 @@ $areas = $stmt->fetchAll();
           </div>
           <div class="mb-3">
             <label class="form-label">Base Path</label>
-            <input type="text" class="form-control" name="basePath" required id="basePath"/>
+            <input type="text" class="form-control" name="basePath" placeholder="ie. /home/" required id="basePath"/>
           </div>
           <div class="mb-3">
             <label class="form-label">Base Level</label>
-            <input type="number" class="form-control" name="levelRange" placeholder="e.g. 10-20" id="levelRange"/>
+            <input type="number" class="form-control" name="levelRange" placeholder="15" required id="levelRange"/>
           </div>
           <div class="mb-3">
             <label class="form-label">Description</label>
