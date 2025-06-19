@@ -16,7 +16,7 @@ if (!$input) {
     exit;
 }
 
-$areaId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$areaId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 if (!$areaId) {
     echo json_encode(['success' => false, 'error' => 'Missing area ID']);
     exit;
@@ -30,7 +30,7 @@ if (!isset($input['grid'], $input['currentX'], $input['currentY'], $input['curre
 
 try {
     $dataJson = json_encode($input);
-    
+
     // Check if a room entry for this area already exists
     $stmt = $pdo->prepare("SELECT id FROM rooms WHERE area_id = ?");
     $stmt->execute([$areaId]);

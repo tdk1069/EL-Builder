@@ -9,7 +9,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
     // Load items assigned to monster_id
-    $monster_id = isset($_GET['monster_id']) ? (int)$_GET['monster_id'] : 0;
+    $monster_id = isset($_GET['monster_id']) ? (int) $_GET['monster_id'] : 0;
     if (!$monster_id) {
         echo json_encode(['error' => 'Invalid monster_id']);
         exit;

@@ -11,7 +11,7 @@ if (!isset($_GET['area_id'])) {
     die('Missing area_id.');
 }
 
-$area_id = (int)$_GET['area_id'];
+$area_id = (int) $_GET['area_id'];
 $username = $_SESSION['username'];
 
 // Fetch area metadata
@@ -71,25 +71,26 @@ $usedObjectIds = [];
 foreach ($grid as $room) {
     if (!empty($room['objects'])) {
         foreach ($room['objects'] as $objectId) {
-            $usedObjectIds[] = (int)$objectId;
+            $usedObjectIds[] = (int) $objectId;
         }
     }
 }
 
 foreach ($monsterItems as $mi) {
-    $usedObjectIds[] = (int)$mi['object_id'];
+    $usedObjectIds[] = (int) $mi['object_id'];
 }
 
 $usedObjectIds = array_unique($usedObjectIds);
 
 $objectMap = [];
 $objects = array_filter($obj, function ($o) use ($usedObjectIds) {
-    return in_array((int)$o['id'], $usedObjectIds);
+    return in_array((int) $o['id'], $usedObjectIds);
 });
 
 $monsterMap = [];
 foreach ($monsters as $monster) {
-    if (!isset($usedMonsterIds[$monster['id']])) continue; // Only include used monsters
+    if (!isset($usedMonsterIds[$monster['id']]))
+        continue; // Only include used monsters
 
     $short = $monster['set_short'] ?? 'monster';
     $filename = strtolower(preg_replace('/[^a-z0-9_]+/', '_', $short));
@@ -117,7 +118,8 @@ foreach ($monsterItems as $mi) {
 }
 
 
-function makeSafeFileName($short) {
+function makeSafeFileName($short)
+{
     $safe = strtolower($short);
     $safe = preg_replace('/[^a-z0-9]+/', '_', $safe); // Replace non-alphanumerics with underscores
     $safe = trim($safe, '_'); // Trim leading/trailing underscores
@@ -180,14 +182,14 @@ foreach ($objects as $object) {
     $long = trim($object['longdesc'] ?? 'A mysterious object lies here.');
     $name = strtolower(preg_replace('/[^a-zA-Z0-9]/', '_', $object['short'] ?? 'item'));
 
-    $levelOffset = (int)$object['level'] - $baseLevel;
+    $levelOffset = (int) $object['level'] - $baseLevel;
     $rawClass = trim($object['class'] ?? 'blade');
     $class = strtolower($rawClass);
     $filename = "$objectDir/{$name}.c";
     $objectMap[$object['id']] = $name;
 
-    $weaponTypes = ['blade','blunt','knife','polearm','projectile','staff','thrown','two handed','whip'];
-    $accessoryTypes = ['amulet','cloak','ring','shield'];
+    $weaponTypes = ['blade', 'blunt', 'knife', 'polearm', 'projectile', 'staff', 'thrown', 'two handed', 'whip'];
+    $accessoryTypes = ['amulet', 'cloak', 'ring', 'shield'];
     $armourSlotMap = [
         'head' => 'helm',
         'torso' => 'armour',
@@ -245,7 +247,7 @@ C;
 
 // Generate room files
 foreach ($grid as $coords => $room) {
-//    $fileName = "room_" . str_replace(',', '_', $coords) . ".c";
+    //    $fileName = "room_" . str_replace(',', '_', $coords) . ".c";
     $fileName = $coordToFile[$coords];
     $short = addslashes($room['set_short'] ?? 'A Room');
     $long = addslashes(trim($room['set_long'] ?? ''));
@@ -263,7 +265,7 @@ foreach ($grid as $coords => $room) {
     $exitStrs = [];
     foreach ($exits as $dir => $target) {
         $targetCoords = "room_" . str_replace(',', '_', $target);
-	$targetFile = $coordToFile[$target];
+        $targetFile = $coordToFile[$target];
         $targetFileNoExt = pathinfo($targetFile, PATHINFO_FILENAME);
         $exitStrs[] = '        "' . $dir . '": ROOMDIR + "' . $targetFileNoExt . '"';
     }
@@ -279,15 +281,15 @@ foreach ($grid as $coords => $room) {
         }
     }
 
-$objectLines = '';
-$objectIds = $room['objects'] ?? [];
+    $objectLines = '';
+    $objectIds = $room['objects'] ?? [];
 
-foreach ($objectIds as $id) {
-    if (isset($objectMap[$id])) {
-        $objectFilename = $objectMap[$id];
-        $objectLines .= "    add_object(OBDIR + \"$objectFilename\", \"\", RT_TRACK);\n";
+    foreach ($objectIds as $id) {
+        if (isset($objectMap[$id])) {
+            $objectFilename = $objectMap[$id];
+            $objectLines .= "    add_object(OBDIR + \"$objectFilename\", \"\", RT_TRACK);\n";
+        }
     }
-}
 
 
     $roomCode = <<<C
@@ -309,14 +311,15 @@ C;
 }
 
 foreach ($monsters as $monster) {
-    if (!isset($usedMonsterIds[$monster['id']])) continue;
+    if (!isset($usedMonsterIds[$monster['id']]))
+        continue;
 
     $short = addslashes($monster['set_short'] ?? 'A Creature');
     $set_name = addslashes($monster['set_name'] ?? 'creature');
     $long = addslashes(trim($monster['set_long'] ?? 'It looks unremarkable.'));
     $name = strtolower(preg_replace('/[^a-zA-Z0-9]/', '_', $monster['set_short'] ?? 'creature'));
 
-    $levelOffset = (int)$monster['set_level'] - $baseLevel;
+    $levelOffset = (int) $monster['set_level'] - $baseLevel;
     $race = strtolower(trim($monster['set_race'] ?? 'unknown'));
     $class = strtolower(trim($monster['set_class'] ?? 'fighter'));
     $gender = strtolower(trim($monster['set_gender'] ?? 'neuter'));
@@ -370,7 +373,8 @@ $files = new RecursiveIteratorIterator(
 );
 
 foreach ($files as $file) {
-    if (!$file->isFile()) continue;
+    if (!$file->isFile())
+        continue;
     $filePath = $file->getRealPath();
     $relativePath = substr($filePath, strlen($baseDir) + 1);
     $zip->addFile($filePath, "$areaName/$relativePath");
@@ -385,10 +389,13 @@ readfile($zipFile);
 
 // Cleanup
 unlink($zipFile);
-function deleteFolder($folder) {
+function deleteFolder($folder)
+{
     foreach (glob($folder . '/*') as $file) {
-        if (is_dir($file)) deleteFolder($file);
-        else unlink($file);
+        if (is_dir($file))
+            deleteFolder($file);
+        else
+            unlink($file);
     }
     rmdir($folder);
 }

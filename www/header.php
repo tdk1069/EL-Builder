@@ -9,7 +9,7 @@
   .mud-header {
     background-color: rgba(255, 248, 220, 0.95);
     border-bottom: 2px solid #7a5c3e;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     padding: 1rem;
     margin: 0;
     font-family: 'Georgia', serif;

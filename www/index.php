@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>MUD Area Builder - Login</title>
@@ -67,75 +68,77 @@
     }
   </style>
 </head>
+
 <body>
 
-<div class="parchment-box">
-  <h2>El'Builder</h2>
-  <form id="loginForm">
-    <div class="mb-3">
-      <label class="form-label">Username</label>
-      <input type="text" name="username" class="form-control" required />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Password</label>
-      <input type="password" name="password" class="form-control" required />
-    </div>
-    <button type="submit" class="btn btn-parchment w-100">Log In</button>
-  </form>
-  <p class="mt-3 text-center">No account? <a href="register.php">Register here</a></p>
-</div>
-
-<!-- Bootstrap Bundle JS (includes Popper) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-document.getElementById('loginForm').onsubmit = async (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-
-  // Convert FormData to plain object
-  const data = {};
-  formData.forEach((value, key) => data[key] = value);
-
-  const res = await fetch('auth/login.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-
-  const result = await res.json();
-
-  if (result.success) {
-    location.href = 'dashboard.php';
-  } else {
-    const modalBody = document.getElementById('errorModalBody');
-    modalBody.textContent = result.error || 'Unknown error';
-
-    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-    errorModal.show();
-
-  }
-};
-</script>
-
-
-<!-- Error Modal -->
-<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content parchment-bg">
-      <div class="modal-header">
-        <h5 class="modal-title" id="errorModalLabel">Login Error</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="parchment-box">
+    <h2>El'Builder</h2>
+    <form id="loginForm">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" required />
       </div>
-      <div class="modal-body" id="errorModalBody">
-        An unknown error occurred.
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" required />
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-parchment" data-bs-dismiss="modal">Close</button>
+      <button type="submit" class="btn btn-parchment w-100">Log In</button>
+    </form>
+    <p class="mt-3 text-center">No account? <a href="register.php">Register here</a></p>
+  </div>
+
+  <!-- Bootstrap Bundle JS (includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    document.getElementById('loginForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+
+      // Convert FormData to plain object
+      const data = {};
+      formData.forEach((value, key) => data[key] = value);
+
+      const res = await fetch('auth/login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        location.href = 'dashboard.php';
+      } else {
+        const modalBody = document.getElementById('errorModalBody');
+        modalBody.textContent = result.error || 'Unknown error';
+
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        errorModal.show();
+
+      }
+    };
+  </script>
+
+
+  <!-- Error Modal -->
+  <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content parchment-bg">
+        <div class="modal-header">
+          <h5 class="modal-title" id="errorModalLabel">Login Error</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="errorModalBody">
+          An unknown error occurred.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-parchment" data-bs-dismiss="modal">Close</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 </body>
+
 </html>

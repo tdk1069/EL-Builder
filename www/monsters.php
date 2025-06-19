@@ -59,399 +59,406 @@ $genders = ['Male', 'Female', 'Unknown'];
 
 <!DOCTYPE html>
 <html>
+
 <head>
-<?php include 'header.php'; ?>
+  <?php include 'header.php'; ?>
   <title>Your Monsters</title>
   <link rel="icon" href="/assets/background.svg" type="image/svg+xml">
   <!-- Fancy font -->
   <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
-<style>
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
+  <style>
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
 
-.modal-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 0.5rem;
-  max-width: 400px;
-  width: 100%;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  text-align: center;
-}
+    .modal-content {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
 
-  .hidden {
-    display: none;
-  }
+    .hidden {
+      display: none;
+    }
 
-  body {
-    background: url('assets/background.svg') no-repeat center center;
-    background-size: cover;
-    font-family: 'Georgia', serif;
-    color: #3e2f1c;
-    padding: 0px;
-  }
+    body {
+      background: url('assets/background.svg') no-repeat center center;
+      background-size: cover;
+      font-family: 'Georgia', serif;
+      color: #3e2f1c;
+      padding: 0px;
+    }
 
-  h1 {
-    font-family: 'UnifrakturCook', cursive;
-    text-align: center;
-    color: #3e2f1c;
-    margin-top: 2rem;
-    margin-bottom: 1.5rem;
-  }
+    h1 {
+      font-family: 'UnifrakturCook', cursive;
+      text-align: center;
+      color: #3e2f1c;
+      margin-top: 2rem;
+      margin-bottom: 1.5rem;
+    }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: rgba(255, 248, 220, 0.95);
-    border: 2px solid #7a5c3e;
-    border-radius: 10px;
-    box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
-  }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: rgba(255, 248, 220, 0.95);
+      border: 2px solid #7a5c3e;
+      border-radius: 10px;
+      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+    }
 
-  th, td {
-    padding: 10px;
-    border: 1px solid #bfa77f;
-    text-align: left;
-  }
+    th,
+    td {
+      padding: 10px;
+      border: 1px solid #bfa77f;
+      text-align: left;
+    }
 
-  th {
-    background-color: #d8c792;
-    color: #3e2f1c;
-    font-weight: bold;
-  }
+    th {
+      background-color: #d8c792;
+      color: #3e2f1c;
+      font-weight: bold;
+    }
 
-  input, textarea, select {
-    background-color: #fdf6e3;
-    color: #3a2f1b;
-    border: 1px solid #d8c792;
-    padding: 6px;
-    width: 100%;
-    font-family: 'Georgia', serif;
-  }
+    input,
+    textarea,
+    select {
+      background-color: #fdf6e3;
+      color: #3a2f1b;
+      border: 1px solid #d8c792;
+      padding: 6px;
+      width: 100%;
+      font-family: 'Georgia', serif;
+    }
 
-  .form-row {
-    margin-top: 20px;
-    background-color: rgba(255, 248, 220, 0.95);
-    border: 2px solid #7a5c3e;
-    padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
-  }
+    .form-row {
+      margin-top: 20px;
+      background-color: rgba(255, 248, 220, 0.95);
+      border: 2px solid #7a5c3e;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+    }
 
-  .form-row h2 {
-    margin-top: 0;
-    font-family: 'UnifrakturCook', cursive;
-  }
+    .form-row h2 {
+      margin-top: 0;
+      font-family: 'UnifrakturCook', cursive;
+    }
 
-  .btn {
-    background-color: #7a5c3e;
-    border: none;
-    color: #fff8e7;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-family: 'Georgia', serif;
-    margin-right: 6px;
-    border-radius: 6px;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-  }
+    .btn {
+      background-color: #7a5c3e;
+      border: none;
+      color: #fff8e7;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-family: 'Georgia', serif;
+      margin-right: 6px;
+      border-radius: 6px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
 
-  .btn:hover {
-    background-color: #5a3e2b;
-  }
-</style>
+    .btn:hover {
+      background-color: #5a3e2b;
+    }
+  </style>
 </head>
+
 <body>
 
-<h1>Welcome, <?=htmlspecialchars($username)?> – Your Monsters</h1>
+  <h1>Welcome, <?= htmlspecialchars($username) ?> – Your Monsters</h1>
 
-<!-- Add New Monster -->
-<div class="form-row">
-  <h2>Add New Monster</h2>
-  <form method="POST" id="monsterForm">
-    <input type="hidden" name="action" value="add">
+  <!-- Add New Monster -->
+  <div class="form-row">
+    <h2>Add New Monster</h2>
+    <form method="POST" id="monsterForm">
+      <input type="hidden" name="action" value="add">
 
-    <label>Class:
-      <select name="set_class" id="classSelect" required onchange="fillExample()">
-        <option value="">-- Select --</option>
-        <?php
-        foreach ($classes as $class) {
-          echo "<option value=\"$class\">$class</option>";
-        }
-        ?>
-      </select>
-    </label>
+      <label>Class:
+        <select name="set_class" id="classSelect" required onchange="fillExample()">
+          <option value="">-- Select --</option>
+          <?php
+          foreach ($classes as $class) {
+            echo "<option value=\"$class\">$class</option>";
+          }
+          ?>
+        </select>
+      </label>
 
-    <label>Race:
-      <select name="set_race" id="raceSelect" required>
-        <option value="">-- Select --</option>
-        <?php
-        foreach ($races as $race) {
-          echo "<option value=\"$race\">$race</option>";
-        }
-        ?>
-      </select>
-    </label>
+      <label>Race:
+        <select name="set_race" id="raceSelect" required>
+          <option value="">-- Select --</option>
+          <?php
+          foreach ($races as $race) {
+            echo "<option value=\"$race\">$race</option>";
+          }
+          ?>
+        </select>
+      </label>
 
-    <label>Gender:
-      <select name="set_gender" id="genderSelect" required>
-        <option value="">-- Select --</option>
-        <?php
-        foreach ($genders as $gender) {
-          echo "<option value=\"$gender\">$gender</option>";
-        }
-        ?>
-      </select>
-    </label>
+      <label>Gender:
+        <select name="set_gender" id="genderSelect" required>
+          <option value="">-- Select --</option>
+          <?php
+          foreach ($genders as $gender) {
+            echo "<option value=\"$gender\">$gender</option>";
+          }
+          ?>
+        </select>
+      </label>
 
-    <label>Level:
-      <input type="number" name="set_level" id="levelInput" min="1" max="100" required>
-    </label><br><br>
+      <label>Level:
+        <input type="number" name="set_level" id="levelInput" min="1" max="100" required>
+      </label><br><br>
 
-    <label>Short Description:
-      <input type="text" name="set_short" id="shortInput" required>
-    </label><br><br>
+      <label>Short Description:
+        <input type="text" name="set_short" id="shortInput" required>
+      </label><br><br>
 
-    <label>Name:
-      <input type="text" name="set_name" id="nameInput" required>
-    </label><br><br>
+      <label>Name:
+        <input type="text" name="set_name" id="nameInput" required>
+      </label><br><br>
 
-    <label>Long Description:
-      <textarea name="set_long" id="longdescInput" rows="4" required></textarea>
-    </label><br><br>
+      <label>Long Description:
+        <textarea name="set_long" id="longdescInput" rows="4" required></textarea>
+      </label><br><br>
 
-    <button class="btn" type="submit">Add Monster</button>
-  </form>
-</div>
-
-<!-- List of Monsters -->
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Class</th>
-      <th>Race</th>
-      <th>Gender</th>
-      <th>Level</th>
-      <th>Short</th>
-      <th>Long</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php foreach ($monsters as $monster): ?>
-    <tr>
-      <form method="POST">
-        <input type="hidden" name="id" value="<?=$monster->id?>">
-        <input type="hidden" name="action" value="update">
-
-        <td><?= $monster->id ?></td>
-
-        <td>
-          <select name="set_class">
-            <?php foreach ($classes as $class): ?>
-              <option value="<?= $class ?>" <?= $monster->set_class === $class ? 'selected' : '' ?>><?= $class ?></option>
-            <?php endforeach; ?>
-          </select>
-        </td>
-
-        <td>
-          <select name="set_race">
-            <?php foreach ($races as $race): ?>
-              <option value="<?= $race ?>" <?= $monster->set_race === $race ? 'selected' : '' ?>><?= $race ?></option>
-            <?php endforeach; ?>
-          </select>
-        </td>
-
-        <td>
-          <select name="set_gender">
-            <?php foreach ($genders as $gender): ?>
-              <option value="<?= $gender ?>" <?= $monster->set_gender === $gender ? 'selected' : '' ?>><?= $gender ?></option>
-            <?php endforeach; ?>
-          </select>
-        </td>
-
-        <td><input type="number" name="set_level" value="<?= htmlspecialchars($monster->set_level) ?>"></td>
-
-        <td><input type="text" name="set_short" value="<?= htmlspecialchars($monster->set_short) ?>"></td>
-
-        <td><input type="text" name="set_name" value="<?= htmlspecialchars($monster->set_name) ?>"></td>
-
-        <td><textarea name="set_long" rows="2"><?= htmlspecialchars($monster->set_long) ?></textarea></td>
-
-        <td>
-          <button class="btn" type="submit">Update</button>
-      </form>
-      <form method="POST" style="display:inline;">
-        <input type="hidden" name="id" value="<?=$monster->id?>">
-        <input type="hidden" name="action" value="delete">
-        <button class="btn" type="submit" style="background:#c33;">Delete</button>
-      </form>
-      <!-- New Items button -->
-      <button type="button" class="btn" onclick="openItemModal(<?= $monster->id ?>)">Items</button>
-      </td> 
-      </td>
-    </tr>
-    <?php endforeach; ?>
-  </tbody>
-</table>
-
-<!-- Monster Item Modal -->
-<div id="itemModal" class="modal-overlay hidden">
-  <div class="modal-content">
-    <h2>Monster Items</h2>
-
-    <select id="itemSelector">
-      <option value="">-- Select item to add --</option>
-    </select>
-    <button onclick="addItemToMonster()">Add</button>
-
-    <ul id="selectedItemsList"></ul>
-
-    <button onclick="saveMonsterItems()">Save</button>
-    <button onclick="closeItemModal()">Close</button>
+      <button class="btn" type="submit">Add Monster</button>
+    </form>
   </div>
-</div>
 
-<script src="examples.js"></script>
-<script>
-let availableItems = [];
-let selectedItems = [];
-let currentMonsterId = null;
+  <!-- List of Monsters -->
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Class</th>
+        <th>Race</th>
+        <th>Gender</th>
+        <th>Level</th>
+        <th>Short</th>
+        <th>Long</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($monsters as $monster): ?>
+        <tr>
+          <form method="POST">
+            <input type="hidden" name="id" value="<?= $monster->id ?>">
+            <input type="hidden" name="action" value="update">
 
-async function openItemModal(monsterId) {
-  currentMonsterId = monsterId;
-  document.getElementById('itemModal').classList.remove('hidden');
+            <td><?= $monster->id ?></td>
 
-  // Load available items (objects)
-  const res = await fetch('/get_objects.php');
-  availableItems = await res.json();
+            <td>
+              <select name="set_class">
+                <?php foreach ($classes as $class): ?>
+                  <option value="<?= $class ?>" <?= $monster->set_class === $class ? 'selected' : '' ?>><?= $class ?></option>
+                <?php endforeach; ?>
+              </select>
+            </td>
 
-  // Populate dropdown
-  const selector = document.getElementById('itemSelector');
-  selector.innerHTML = '<option value="">-- Select item to add --</option>';
-  availableItems.forEach(item => {
-    const opt = document.createElement('option');
-    opt.value = item.id;
-    opt.textContent = `${item.short} (Lvl ${item.level})`;
-    selector.appendChild(opt);
-  });
+            <td>
+              <select name="set_race">
+                <?php foreach ($races as $race): ?>
+                  <option value="<?= $race ?>" <?= $monster->set_race === $race ? 'selected' : '' ?>><?= $race ?></option>
+                <?php endforeach; ?>
+              </select>
+            </td>
 
-  // Load assigned items for this monster
-  const assignedRes = await fetch(`/monster_items.php?monster_id=${monsterId}`);
-  const assignedIds = await assignedRes.json();
+            <td>
+              <select name="set_gender">
+                <?php foreach ($genders as $gender): ?>
+                  <option value="<?= $gender ?>" <?= $monster->set_gender === $gender ? 'selected' : '' ?>><?= $gender ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
+            </td>
 
-  // Pre-populate selectedItems by matching IDs with availableItems
-  selectedItems = availableItems.filter(item => assignedIds.includes(item.id));
+            <td><input type="number" name="set_level" value="<?= htmlspecialchars($monster->set_level) ?>"></td>
 
-  updateSelectedItemsUI();
-}
+            <td><input type="text" name="set_short" value="<?= htmlspecialchars($monster->set_short) ?>"></td>
 
-function addItemToMonster() {
-  const selector = document.getElementById('itemSelector');
-  const selectedId = parseInt(selector.value);
-  if (!selectedId) return;
+            <td><input type="text" name="set_name" value="<?= htmlspecialchars($monster->set_name) ?>"></td>
 
-  if (selectedItems.find(i => i.id === selectedId)) return; // already added
+            <td><textarea name="set_long" rows="2"><?= htmlspecialchars($monster->set_long) ?></textarea></td>
 
-  const item = availableItems.find(i => i.id === selectedId);
-  if (!item) return;
+            <td>
+              <button class="btn" type="submit">Update</button>
+          </form>
+          <form method="POST" style="display:inline;">
+            <input type="hidden" name="id" value="<?= $monster->id ?>">
+            <input type="hidden" name="action" value="delete">
+            <button class="btn" type="submit" style="background:#c33;">Delete</button>
+          </form>
+          <!-- New Items button -->
+          <button type="button" class="btn" onclick="openItemModal(<?= $monster->id ?>)">Items</button>
+          </td>
+          </td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
 
-  selectedItems.push(item);
-  updateSelectedItemsUI();
-}
+  <!-- Monster Item Modal -->
+  <div id="itemModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2>Monster Items</h2>
 
-function removeItem(itemId) {
-  selectedItems = selectedItems.filter(i => i.id !== itemId);
-  updateSelectedItemsUI();
-}
+      <select id="itemSelector">
+        <option value="">-- Select item to add --</option>
+      </select>
+      <button onclick="addItemToMonster()">Add</button>
 
-function updateSelectedItemsUI() {
-  const list = document.getElementById('selectedItemsList');
-  list.innerHTML = '';
+      <ul id="selectedItemsList"></ul>
 
-  selectedItems.forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = `${item.short} (Lvl ${item.level})`;
+      <button onclick="saveMonsterItems()">Save</button>
+      <button onclick="closeItemModal()">Close</button>
+    </div>
+  </div>
 
-    const btn = document.createElement('button');
-    btn.textContent = '-';
-    btn.style.marginLeft = '1em';
-    btn.onclick = () => removeItem(item.id);
+  <script src="examples.js"></script>
+  <script>
+    let availableItems = [];
+    let selectedItems = [];
+    let currentMonsterId = null;
 
-    li.appendChild(btn);
-    list.appendChild(li);
-  });
-}
+    async function openItemModal(monsterId) {
+      currentMonsterId = monsterId;
+      document.getElementById('itemModal').classList.remove('hidden');
 
-async function saveMonsterItems() {
-  if (!currentMonsterId) return;
+      // Load available items (objects)
+      const res = await fetch('/get_objects.php');
+      availableItems = await res.json();
 
-  const idsToSave = selectedItems.map(i => i.id);
+      // Populate dropdown
+      const selector = document.getElementById('itemSelector');
+      selector.innerHTML = '<option value="">-- Select item to add --</option>';
+      availableItems.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.id;
+        opt.textContent = `${item.short} (Lvl ${item.level})`;
+        selector.appendChild(opt);
+      });
 
-  try {
-    const res = await fetch('/monster_items.php', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        monster_id: currentMonsterId,
-        items: idsToSave
-      })
-    });
+      // Load assigned items for this monster
+      const assignedRes = await fetch(`/monster_items.php?monster_id=${monsterId}`);
+      const assignedIds = await assignedRes.json();
 
-    const json = await res.json();
+      // Pre-populate selectedItems by matching IDs with availableItems
+      selectedItems = availableItems.filter(item => assignedIds.includes(item.id));
 
-    if (json.success) {
-      console.log('Items saved successfully!');
-      closeItemModal();
-    } else {
-      console.log('Error saving items: ' + (json.error || 'unknown error'));
+      updateSelectedItemsUI();
     }
-  } catch (e) {
-    console.log('Request failed: ' + e.message);
-  }
-}
 
-function closeItemModal() {
-  document.getElementById('itemModal').classList.add('hidden');
-}
+    function addItemToMonster() {
+      const selector = document.getElementById('itemSelector');
+      const selectedId = parseInt(selector.value);
+      if (!selectedId) return;
 
-function fillExample() {
-  const classType = document.getElementById('classSelect').value;
-  const shortInput = document.getElementById('shortInput');
-  const nameInput = document.getElementById('nameInput');
-  const longdescInput = document.getElementById('longdescInput');
-  const levelInput = document.getElementById('levelInput');
-  const raceSelect = document.getElementById('raceSelect');
-  const genderSelect = document.getElementById('genderSelect');
+      if (selectedItems.find(i => i.id === selectedId)) return; // already added
 
-  if (exampleMonsters[classType]) {
-    const random = exampleMonsters[classType][Math.floor(Math.random() * exampleMonsters[classType].length)];
+      const item = availableItems.find(i => i.id === selectedId);
+      if (!item) return;
 
-    shortInput.value = random.set_short || '';
-    nameInput.value = random.set_short || '';
-    longdescInput.value = random.set_long || '';
-    levelInput.value = random.set_level || '';
-    raceSelect.value = random.set_race || '';
-    genderSelect.value = random.set_gender || '';
-  } else {
-    shortInput.value = '';
-    nameInput.value = '';
-    longdescInput.value = '';
-    levelInput.value = '';
-    raceSelect.value = '';
-    genderSelect.value = '';
-  }
-}
+      selectedItems.push(item);
+      updateSelectedItemsUI();
+    }
 
-</script>
+    function removeItem(itemId) {
+      selectedItems = selectedItems.filter(i => i.id !== itemId);
+      updateSelectedItemsUI();
+    }
+
+    function updateSelectedItemsUI() {
+      const list = document.getElementById('selectedItemsList');
+      list.innerHTML = '';
+
+      selectedItems.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.short} (Lvl ${item.level})`;
+
+        const btn = document.createElement('button');
+        btn.textContent = '-';
+        btn.style.marginLeft = '1em';
+        btn.onclick = () => removeItem(item.id);
+
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    }
+
+    async function saveMonsterItems() {
+      if (!currentMonsterId) return;
+
+      const idsToSave = selectedItems.map(i => i.id);
+
+      try {
+        const res = await fetch('/monster_items.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            monster_id: currentMonsterId,
+            items: idsToSave
+          })
+        });
+
+        const json = await res.json();
+
+        if (json.success) {
+          console.log('Items saved successfully!');
+          closeItemModal();
+        } else {
+          console.log('Error saving items: ' + (json.error || 'unknown error'));
+        }
+      } catch (e) {
+        console.log('Request failed: ' + e.message);
+      }
+    }
+
+    function closeItemModal() {
+      document.getElementById('itemModal').classList.add('hidden');
+    }
+
+    function fillExample() {
+      const classType = document.getElementById('classSelect').value;
+      const shortInput = document.getElementById('shortInput');
+      const nameInput = document.getElementById('nameInput');
+      const longdescInput = document.getElementById('longdescInput');
+      const levelInput = document.getElementById('levelInput');
+      const raceSelect = document.getElementById('raceSelect');
+      const genderSelect = document.getElementById('genderSelect');
+
+      if (exampleMonsters[classType]) {
+        const random = exampleMonsters[classType][Math.floor(Math.random() * exampleMonsters[classType].length)];
+
+        shortInput.value = random.set_short || '';
+        nameInput.value = random.set_short || '';
+        longdescInput.value = random.set_long || '';
+        levelInput.value = random.set_level || '';
+        raceSelect.value = random.set_race || '';
+        genderSelect.value = random.set_gender || '';
+      } else {
+        shortInput.value = '';
+        nameInput.value = '';
+        longdescInput.value = '';
+        levelInput.value = '';
+        raceSelect.value = '';
+        genderSelect.value = '';
+      }
+    }
+
+  </script>
 
 </body>
+
 </html>

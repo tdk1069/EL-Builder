@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>MUD Area Builder - Register</title>
@@ -66,57 +67,59 @@
     }
   </style>
 </head>
+
 <body>
 
-<div class="parchment-box">
-  <h2>Create Account</h2>
-  <form id="registerForm">
-    <div class="mb-3">
-      <label class="form-label">Username</label>
-      <input type="text" name="username" class="form-control" required />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Password</label>
-      <input type="password" name="password" class="form-control" required />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Confirm Password</label>
-      <input type="password" name="confirm" class="form-control" required />
-    </div>
-    <button type="submit" class="btn btn-parchment w-100">Register</button>
-  </form>
-  <p class="mt-3 text-center">Already registered? <a href="/index.php">Return to login</a></p>
-</div>
+  <div class="parchment-box">
+    <h2>Create Account</h2>
+    <form id="registerForm">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Confirm Password</label>
+        <input type="password" name="confirm" class="form-control" required />
+      </div>
+      <button type="submit" class="btn btn-parchment w-100">Register</button>
+    </form>
+    <p class="mt-3 text-center">Already registered? <a href="/index.php">Return to login</a></p>
+  </div>
 
-<script>
-document.getElementById('registerForm').onsubmit = async (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
+  <script>
+    document.getElementById('registerForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
 
-  const password = formData.get('password');
-  const confirm = formData.get('confirm');
-  if (password !== confirm) {
-    alert("Passwords do not match.");
-    return;
-  }
+      const password = formData.get('password');
+      const confirm = formData.get('confirm');
+      if (password !== confirm) {
+        alert("Passwords do not match.");
+        return;
+      }
 
-  const res = await fetch('auth/register.php', {
-    method: 'POST',
-    body: JSON.stringify({
-      username: formData.get('username'),
-      password: password
-    }),
-    headers: { 'Content-Type': 'application/json' }
-  });
+      const res = await fetch('auth/register.php', {
+        method: 'POST',
+        body: JSON.stringify({
+          username: formData.get('username'),
+          password: password
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      });
 
-  const result = await res.json();
-  if (result.success) {
-    location.href = 'dashboard.php';
-  } else {
-    alert(result.error || "Registration failed.");
-  }
-};
-</script>
+      const result = await res.json();
+      if (result.success) {
+        location.href = 'dashboard.php';
+      } else {
+        alert(result.error || "Registration failed.");
+      }
+    };
+  </script>
 
 </body>
+
 </html>
