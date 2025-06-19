@@ -422,6 +422,35 @@ async function saveMonsterItems() {
 function closeItemModal() {
   document.getElementById('itemModal').classList.add('hidden');
 }
+
+function fillExample() {
+  const classType = document.getElementById('classSelect').value;
+  const shortInput = document.getElementById('shortInput');
+  const nameInput = document.getElementById('nameInput');
+  const longdescInput = document.getElementById('longdescInput');
+  const levelInput = document.getElementById('levelInput');
+  const raceSelect = document.getElementById('raceSelect');
+  const genderSelect = document.getElementById('genderSelect');
+
+  if (exampleMonsters[classType]) {
+    const random = exampleMonsters[classType][Math.floor(Math.random() * exampleMonsters[classType].length)];
+
+    shortInput.value = random.set_short || '';
+    nameInput.value = random.set_short || '';
+    longdescInput.value = random.set_long || '';
+    levelInput.value = random.set_level || '';
+    raceSelect.value = random.set_race || '';
+    genderSelect.value = random.set_gender || '';
+  } else {
+    shortInput.value = '';
+    nameInput.value = '';
+    longdescInput.value = '';
+    levelInput.value = '';
+    raceSelect.value = '';
+    genderSelect.value = '';
+  }
+}
+
 </script>
 
 </body>

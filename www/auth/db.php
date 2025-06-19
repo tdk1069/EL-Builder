@@ -83,6 +83,7 @@ $tables = [
             owner VARCHAR(255) NOT NULL,
             class VARCHAR(255) NOT NULL,
             short TEXT,
+            name TEXT,
             longdesc TEXT,
             level INT(11),
             PRIMARY KEY (id)

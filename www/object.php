@@ -329,16 +329,19 @@ const examples = {
 function fillExample() {
   const classType = document.getElementById('classSelect').value;
   const shortInput = document.getElementById('shortInput');
+  const nameInput = document.getElementById('nameInput');
   const longdescInput = document.getElementById('longdescInput');
   const levelInput = document.getElementById('levelInput');
 
   if (examples[classType]) {
     const random = examples[classType][Math.floor(Math.random() * examples[classType].length)];
     shortInput.value = random.short;
+    nameInput.value = random.short;
     longdescInput.value = random.long;
     levelInput.value = random.level || '';
   } else {
     shortInput.value = '';
+    nameInput.value = '';
     longdescInput.value = '';
     levelInput.value = '';
   }

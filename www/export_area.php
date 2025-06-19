@@ -350,6 +350,8 @@ void create()
     set_gender("{$gender}");
     set_race("{$race}");
     set_class("{$class}");{$addObjectCode}
+    command("wield all");
+    command("wear all");
 }
 C;
 
