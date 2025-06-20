@@ -506,6 +506,7 @@ function uploadArea(event) {
 }
 
 function saveAreaToDb(callback) {
+  saveRoom();
   const areaData = {
     grid: grid,
     currentX: currentX,

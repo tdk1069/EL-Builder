@@ -254,12 +254,28 @@ foreach ($grid as $coords => $room) {
     $items = $room['set_items'] ?? [];
     $exits = $room['exits'] ?? [];
 
-    // Format items
-    $itemStrs = [];
-    foreach ($items as $item) {
-        $itemStrs[] = '        "' . addslashes($item['name']) . '": "' . addslashes($item['description']) . '"';
+// Format items
+$itemStrs = [];
+foreach ($items as $item) {
+    $name = $item['name'];
+    $desc = addslashes($item['description']);
+
+    if (strpos($name, ',') !== false) {
+        // Handle multiple aliases
+        $aliases = array_map(
+            fn($alias) => '"' . addslashes(trim($alias)) . '"',
+            explode(',', $name)
+        );
+        $key = '({' . implode(', ', $aliases) . '})';
+    } else {
+        // Single item name
+        $key = '"' . addslashes($name) . '"';
     }
-    $itemBlock = empty($itemStrs) ? '' : "    set_items(([\n" . implode(",\n", $itemStrs) . "\n    ]));\n";
+
+    $itemStrs[] = "        $key: \"$desc\"";
+}
+
+$itemBlock = empty($itemStrs) ? '' : "    set_items(([\n" . implode(",\n", $itemStrs) . "\n    ]));\n";
 
     // Format exits
     $exitStrs = [];
