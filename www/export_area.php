@@ -245,12 +245,25 @@ C;
     file_put_contents($filename, $code);
 }
 
+function formatLongText($functionName, $text, $indent = '    ', $wrapLength = 72) {
+    $wrapped = wordwrap($text, $wrapLength - strlen($indent) - 2, "\n", false);
+    $lines = explode("\n", $wrapped);
+
+    $result = $indent . $functionName . "(\"" . array_shift($lines) . "\"\n";
+    foreach ($lines as $line) {
+        $result .= $indent . "  \"" . $line . "\"\n";
+    }
+    $result = rtrim($result) . ");";
+    return $result;
+}
+
+
 // Generate room files
 foreach ($grid as $coords => $room) {
     //    $fileName = "room_" . str_replace(',', '_', $coords) . ".c";
     $fileName = $coordToFile[$coords];
-    $short = addslashes($room['set_short'] ?? 'A Room');
-    $long = addslashes(trim($room['set_long'] ?? ''));
+    $short = formatLongText("set_short",addslashes($room['set_short'] ?? 'A Room'));
+    $long = formatLongText("set_long",addslashes(trim($room['set_long'] ?? '')));
     $items = $room['set_items'] ?? [];
     $exits = $room['exits'] ?? [];
 
@@ -318,8 +331,8 @@ inherit ROOM;
 void create()
 {
     ::create();
-    set_short("$short");
-    set_long("$long");
+$short
+$long
 $itemBlock$exitBlock$monsterLines$objectLines}
 C;
 
