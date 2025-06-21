@@ -196,12 +196,10 @@ function saveRoom() {
     set_short: document.getElementById("set_short").value,
     set_long: document.getElementById("set_long").value,
     set_smell: document.getElementById("set_smell").value,
-    set_terrain: document.getElementById("terrainSelect").value,
     set_items: getItems(),
     exits: grid[key(currentX, currentY, currentZ)]?.exits || {},
     monsters: getMonsters(),
     objects: getObjects(),
-    notes: document.getElementById("notes").value,
   };
   grid[key(currentX, currentY, currentZ)] = room;
   drawMap();
@@ -290,53 +288,6 @@ function move(dir) {
   drawMap();
 }
 
-function digDirection(dir) {
-  const dx = {
-    west: -1, east: 1, north: 0, south: 0,
-    northeast: 1, northwest: -1, southeast: 1, southwest: -1,
-    up: 0, down: 0,
-  };
-
-  const dy = {
-    west: 0, east: 0, north: -1, south: 1,
-    northeast: -1, northwest: -1, southeast: 1, southwest: 1,
-    up: 0, down: 0,
-  };
-
-  const dz = {
-    west: 0, east: 0, north: 0, south: 0,
-    northeast: 0, northwest: 0, southeast: 0, southwest: 0,
-    up: 1, down: -1,
-  };
-
-  const newX = currentX + (dx[dir] || 0);
-  const newY = currentY + (dy[dir] || 0);
-  const newZ = currentZ + (dz[dir] || 0);
-  const newKey = key(newX, newY, newZ);
-  const curKey = key(currentX, currentY, currentZ);
-
-  if (!grid[curKey]) grid[curKey] = { exits: {} };
-  grid[curKey].exits[dir] = newKey;
-
-  if (!grid[newKey]) {
-    const desc = getRandomRoomDescription();
-    grid[newKey] = {
-      exits: {},
-      set_short: desc.short,
-      set_long: desc.long,
-    };
-  }
-
-  const reverse = {
-    north: "south", south: "north", east: "west", west: "east",
-    northeast: "southwest", northwest: "southeast",
-    southeast: "northwest", southwest: "northeast",
-    up: "down", down: "up",
-  };
-  grid[newKey].exits[reverse[dir]] = curKey;
-}
-
-
 function loadRoom() {
   const curKey = key(currentX, currentY, currentZ);
   const room = grid[curKey] || {};
@@ -344,8 +295,6 @@ function loadRoom() {
   document.getElementById("set_short").value = room.set_short || "";
   document.getElementById("set_long").value = room.set_long || "";
   document.getElementById("set_smell").value = room.set_smell || "";
-  document.getElementById("terrainSelect").value = room.set_terrain || "";
-  document.getElementById("notes").value = room.notes || "";
 
   // Clear existing item inputs
   const itemContainer = document.getElementById("itemsContainer");
@@ -990,7 +939,6 @@ function addObjectRow(selectedId = "") {
   container.appendChild(row);
 }
 function openImportModal() {
-  document.getElementById('lpcInput').value = '';
   document.getElementById('importModal').style.display = 'flex';
 }
 
@@ -1007,11 +955,10 @@ function parseAndImportLPC() {
 
   // Regex for set_items (mapping version only for now)
   const itemMatch = input.match(/set_items\s*\(\s*\(\[\s*([\s\S]*?)\s*\]\)\s*\)/);
+console.log(itemMatch);
   if (shortMatch) {
     document.getElementById('set_short').value = shortMatch[1];
   }
-
-  const exitMatch = input.match(/set_exits\s*\(\s*\(\[\s*([\s\S]*?)\s*\]\)\s*\)/);
 
   if (longMatch) {
     let rawLong = longMatch[1];
@@ -1029,51 +976,31 @@ function parseAndImportLPC() {
     document.getElementById('set_long').value = rawLong;
   }
 
-  if (itemMatch) {
-    // Clear existing item inputs
-    const itemContainer = document.getElementById("itemsContainer");
-    itemContainer.innerHTML = "";
-    let rawItems = itemMatch[1];
+if (itemMatch) {
+  let rawItems = itemMatch[1];
 
-    // Clean up: remove line breaks and join wrapped strings
-    rawItems = rawItems
-      .replace(/"\s*"\s*/g, '')     // unwrap line breaks in strings
-      .replace(/\s+/g, ' ')         // normalize whitespace
-      .replace(/\\"/g, '"')         // unescape any escaped quotes
-      .replace(/\s*,\s*/g, ',')     // clean up spacing around commas
-      .trim();
+  // Clean up: remove line breaks and join wrapped strings
+  rawItems = rawItems
+    .replace(/"\s*"\s*/g, '')     // unwrap line breaks in strings
+    .replace(/\s+/g, ' ')         // normalize whitespace
+    .replace(/\\"/g, '"')         // unescape any escaped quotes
+    .replace(/\s*,\s*/g, ',')     // clean up spacing around commas
+    .trim();
 
-    // Match each ({"alias",...}) : "description"
-    const itemRegex = /\(\{([^\}]+)\}\)\s*:\s*"([^"]+)"/g;
-    const items = [];
-    let match;
-
-    while ((match = itemRegex.exec(rawItems)) !== null) {
-      const aliases = match[1].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-      const description = match[2];
-      items.push({ aliases, description });
-    }
-
-  items.forEach(item => {
-    addItemRow(item.aliases.join(', '), item.description);
-  });
-
-
-  }
-
-if (exitMatch) {
-  const exitsRaw = exitMatch[1];
-  const exitRegex = /"(\w+)"\s*:\s*([^,)\]]+)/g;
+  // Match each ({"alias",...}) : "description"
+  const itemRegex = /\(\{([^\}]+)\}\)\s*:\s*"([^"]+)"/g;
+  const items = [];
   let match;
 
-  while ((match = exitRegex.exec(exitsRaw)) !== null) {
-    const dir = match[1];
-    // const target = match[2].trim(); // Optional: the room path expression
-    digDirection(dir);
+  while ((match = itemRegex.exec(rawItems)) !== null) {
+    const aliases = match[1].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+    const description = match[2];
+    items.push({ aliases, description });
   }
+
 }
+
   saveRoom();
-  drawMap();
   closeImportModal();
 }
 

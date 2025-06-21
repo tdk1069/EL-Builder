@@ -196,12 +196,10 @@ function saveRoom() {
     set_short: document.getElementById("set_short").value,
     set_long: document.getElementById("set_long").value,
     set_smell: document.getElementById("set_smell").value,
-    set_terrain: document.getElementById("terrainSelect").value,
     set_items: getItems(),
     exits: grid[key(currentX, currentY, currentZ)]?.exits || {},
     monsters: getMonsters(),
     objects: getObjects(),
-    notes: document.getElementById("notes").value,
   };
   grid[key(currentX, currentY, currentZ)] = room;
   drawMap();
@@ -344,8 +342,6 @@ function loadRoom() {
   document.getElementById("set_short").value = room.set_short || "";
   document.getElementById("set_long").value = room.set_long || "";
   document.getElementById("set_smell").value = room.set_smell || "";
-  document.getElementById("terrainSelect").value = room.set_terrain || "";
-  document.getElementById("notes").value = room.notes || "";
 
   // Clear existing item inputs
   const itemContainer = document.getElementById("itemsContainer");

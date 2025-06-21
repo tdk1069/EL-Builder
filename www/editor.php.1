@@ -50,10 +50,8 @@ $roomJson = $roomRow ? $roomRow->data : null;
       <!-- Tab Buttons -->
       <div class="tab-buttons">
         <button onclick="showTab('basic')" class="active">Basic</button>
-        <button onclick="showTab('properties')">Room Properties</button>
         <button onclick="showTab('objects')">Objects</button>
         <button onclick="showTab('monsters')">Monsters</button>
-        <button onclick="showTab('notes')">Notes</button>
       </div>
       <!-- Tab Content Areas -->
       <div id="tab-basic" class="tab-content">
@@ -115,7 +113,6 @@ $roomJson = $roomRow ? $roomRow->data : null;
           <div class="save-controls" style="margin-top: 10px;">
             <button onclick="saveAreaToDb()">Save Area to Database</button>
             <a href="dashboard.php" id="backToDashboard" class="back-button">Back to Dashboard</a>
-            <button onclick="openImportModal()">Import Room Code</button>
 
           </div>
 
@@ -127,47 +124,13 @@ $roomJson = $roomRow ? $roomRow->data : null;
         <div id="monsterContainer"></div>
         <button type="button" onclick="addMonsterRow()">+ Add Monster</button>
       </div>
-      <div id="tab-properties" class="tab-content" style="display: none;">
-      <div id="editor">
-      <label>Terrain:
-        <select name="set_terrain" id="terrainSelect">
-          <option value="">-- Select --</option>
-          <?php
-	  $terrains = ['forest','plains','hills','mountains','town','coast','sea','swamp','jungle','underwater','desert','river','tundra','snowplains','treetops','river','lake'];
-          foreach ($terrains as $terrain) {
-            echo "<option value=\"$terrain\">$terrain</option>";
-          }
-          ?>
-        </select>
-      </label>
-      </div>
-      </div>
       <div id="tab-objects" class="tab-content" style="display: none;">
         <!-- Object assignment UI (dropdown + list of assigned Objects-->
         <div id="objectContainer"></div>
         <button type="button" onclick="addObjectRow()">+ Add Object</button>
       </div>
 
-      <!-- Tab Content Notes -->
-      <div id="tab-notes" class="tab-content">
-      <div id="editor">
-        <label for="notes" style="display:block; margin-bottom:0.5rem; font-weight:bold;">Room Notes:</label>
-        <textarea id="notes" name="notes" rows="10" placeholder="Add design notes, ideas, or comments here..." style="width:100%; padding:0.75rem; font-family:monospace; border:1px solid #ccc; border-radius:8px; resize:vertical;"></textarea>
-      </div>
-      </div>
-    </div>
 
-    <!-- Modal -->
-    <div id="importModal">
-      <div class="modal-content">
-        <h2>Import LPC Room Code</h2>
-        <textarea id="lpcInput" style="width: 100%; height: 300px;"></textarea>
-        <div style="margin-top: 1em; text-align: right;">
-          <button onclick="closeImportModal()">Cancel</button>
-          <button onclick="parseAndImportLPC()">Import</button>
-        </div>
-        <button onclick="closeImportModal()" style="position:absolute; top: 0.5em; right: 0.75em; font-size: 1.5em; background: none; border: none;">&times;</button>
-      </div>
     </div>
 
     <script src="compromise.js"></script>

@@ -266,7 +266,24 @@ foreach ($grid as $coords => $room) {
     $long = formatLongText("set_long",addslashes(trim($room['set_long'] ?? '')));
     $items = $room['set_items'] ?? [];
     $exits = $room['exits'] ?? [];
+    $terrain = '';
+    $rawTerrain = trim($room['set_terrain'] ?? '');
+    if ($rawTerrain !== '') {
+        $terrain = formatLongText("set_terrain", addslashes($rawTerrain));
+    }
+    $comments = '';
+    if (!empty(trim($room['notes'] ?? ''))) {
+        // Clean and trim notes
+        $notes = trim($room['notes']);
 
+        $wrappedLines = wordwrap($notes, 72, "\n", false);
+
+        // Prefix each line with "// "
+        $lines = explode("\n", $wrappedLines);
+        foreach ($lines as $line) {
+            $comments .= "// " . $line . "\n";
+        }
+    }
 // Format items
 $itemStrs = [];
 foreach ($items as $item) {
@@ -322,6 +339,7 @@ $itemBlock = empty($itemStrs) ? '' : "    set_items(([\n" . implode(",\n", $item
 
 
     $roomCode = <<<C
+$comments
 #include "../include/include.h"
 
 #include <std.h>
@@ -333,6 +351,7 @@ void create()
     ::create();
 $short
 $long
+$terrain
 $itemBlock$exitBlock$monsterLines$objectLines}
 C;
 
