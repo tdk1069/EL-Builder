@@ -69,6 +69,7 @@ $tables = [
             set_short TEXT,
             set_name TEXT NOT NULL,
             set_long TEXT,
+            set_spells TEXT,
             set_class TEXT NOT NULL,
             set_race TEXT NOT NULL,
             set_level INT(11) NOT NULL,

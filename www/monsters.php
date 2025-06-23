@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
     if ($action === 'add') {
-      $stmt = $pdo->prepare("INSERT INTO monsters (owner, set_class, set_race, set_gender, set_level, set_short, set_name, set_long) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+      $stmt = $pdo->prepare("INSERT INTO monsters (owner, set_class, set_race, set_gender, set_level, set_short, set_spells, set_name, set_long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
       $stmt->execute([
         $username,
         $_POST['set_class'],
@@ -22,17 +22,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_POST['set_gender'],
         $_POST['set_level'],
         $_POST['set_short'],
+        $_POST['set_spells'],
         $_POST['set_name'],
         $_POST['set_long']
       ]);
     } elseif ($action === 'update' && isset($_POST['id'])) {
-      $stmt = $pdo->prepare("UPDATE monsters SET set_class=?, set_race=?, set_gender=?, set_level=?, set_short=?, set_name=?, set_long=? WHERE id=? AND owner=?");
+      $stmt = $pdo->prepare("UPDATE monsters SET set_class=?, set_race=?, set_gender=?, set_level=?, set_short=?, set_spells=?, set_name=?, set_long=? WHERE id=? AND owner=?");
       $stmt->execute([
         $_POST['set_class'],
         $_POST['set_race'],
         $_POST['set_gender'],
         $_POST['set_level'],
         $_POST['set_short'],
+        $_POST['set_spells'],
         $_POST['set_name'],
         $_POST['set_long'],
         $_POST['id'],
@@ -232,6 +234,10 @@ $genders = ['Male', 'Female', 'Unknown'];
         <textarea name="set_long" id="longdescInput" rows="4" required></textarea>
       </label><br><br>
 
+      <label>Skills/Spells (Comma seperated):
+        <input type="text" name="set_spells" id="spellsInput" required>
+      </label><br><br>
+
       <button class="btn" type="submit">Add Monster</button>
     </form>
   </div>
@@ -247,6 +253,7 @@ $genders = ['Male', 'Female', 'Unknown'];
         <th>Level</th>
         <th>Short</th>
         <th>Long</th>
+        <th>Spells/Skills</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -289,6 +296,8 @@ $genders = ['Male', 'Female', 'Unknown'];
             <td><input type="text" name="set_short" value="<?= htmlspecialchars($monster->set_short) ?>"></td>
 
             <td><input type="text" name="set_name" value="<?= htmlspecialchars($monster->set_name) ?>"></td>
+
+            <td><input type="text" name="set_spells" value="<?= htmlspecialchars($monster->set_spells) ?>"></td>
 
             <td><textarea name="set_long" rows="2"><?= htmlspecialchars($monster->set_long) ?></textarea></td>
 
@@ -442,6 +451,7 @@ $genders = ['Male', 'Female', 'Unknown'];
         const random = exampleMonsters[classType][Math.floor(Math.random() * exampleMonsters[classType].length)];
 
         shortInput.value = random.set_short || '';
+        spellsInput.value = random.set_spells || '';
         nameInput.value = random.set_short || '';
         longdescInput.value = random.set_long || '';
         levelInput.value = random.set_level || '';
@@ -449,6 +459,7 @@ $genders = ['Male', 'Female', 'Unknown'];
         genderSelect.value = random.set_gender || '';
       } else {
         shortInput.value = '';
+        spellsInput.value = '';
         nameInput.value = '';
         longdescInput.value = '';
         levelInput.value = '';

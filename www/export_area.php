@@ -372,6 +372,14 @@ foreach ($monsters as $monster) {
     $class = strtolower(trim($monster['set_class'] ?? 'fighter'));
     $gender = strtolower(trim($monster['set_gender'] ?? 'neuter'));
 
+    $spells = strtolower(trim($monster['set_spells'] ?? ''));
+    $spellArray = array_filter(array_map('trim', explode(',', $spells)));
+
+    $spellsLine = '';
+    if (!empty($spellArray)) {
+        $spellsLine = '    set_spells(({' . implode(', ', array_map(fn($s) => "\"$s\"", $spellArray)) . '}));';
+    }
+
     $filename = "$monsterDir/{$name}.c";
 
     // Build the add_object lines
@@ -405,6 +413,7 @@ void create()
     set_gender("{$gender}");
     set_race("{$race}");
     set_class("{$class}");{$addObjectCode}{$commands}
+{$spellsLine}
 }
 C;
 
