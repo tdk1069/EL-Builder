@@ -182,9 +182,8 @@ $genders = ['Male', 'Female', 'Unknown'];
   <!-- Add New Monster -->
   <div class="form-row">
     <h2>Add New Monster</h2>
-    <form method="POST" id="monsterForm" data-mode="add">
-      <input type="hidden" name="action" id="formAction" value="add">
-      <input type="hidden" name="id" id="monsterId" value="">
+    <form method="POST" id="monsterForm">
+      <input type="hidden" name="action" value="add">
 
       <label>Class:
         <select name="set_class" id="classSelect" required onchange="fillExample()">
@@ -236,10 +235,10 @@ $genders = ['Male', 'Female', 'Unknown'];
       </label><br><br>
 
       <label>Skills/Spells (Comma seperated):
-        <input type="text" name="set_spells" id="spellsInput">
+        <input type="text" name="set_spells" id="spellsInput" required>
       </label><br><br>
 
-      <button class="btn" type="submit" id="submitButton">Add Monster</button>
+      <button class="btn" type="submit">Add Monster</button>
     </form>
   </div>
 
@@ -253,7 +252,6 @@ $genders = ['Male', 'Female', 'Unknown'];
         <th>Gender</th>
         <th>Level</th>
         <th>Short</th>
-        <th>Name</th>
         <th>Long</th>
         <th>Spells/Skills</th>
         <th>Actions</th>
@@ -269,7 +267,7 @@ $genders = ['Male', 'Female', 'Unknown'];
             <td><?= $monster->id ?></td>
 
             <td>
-              <select name="set_class" disabled>
+              <select name="set_class">
                 <?php foreach ($classes as $class): ?>
                   <option value="<?= $class ?>" <?= $monster->set_class === $class ? 'selected' : '' ?>><?= $class ?></option>
                 <?php endforeach; ?>
@@ -277,7 +275,7 @@ $genders = ['Male', 'Female', 'Unknown'];
             </td>
 
             <td>
-              <select name="set_race" disabled>
+              <select name="set_race">
                 <?php foreach ($races as $race): ?>
                   <option value="<?= $race ?>" <?= $monster->set_race === $race ? 'selected' : '' ?>><?= $race ?></option>
                 <?php endforeach; ?>
@@ -285,7 +283,7 @@ $genders = ['Male', 'Female', 'Unknown'];
             </td>
 
             <td>
-              <select name="set_gender" disabled>
+              <select name="set_gender">
                 <?php foreach ($genders as $gender): ?>
                   <option value="<?= $gender ?>" <?= $monster->set_gender === $gender ? 'selected' : '' ?>><?= $gender ?>
                   </option>
@@ -293,22 +291,18 @@ $genders = ['Male', 'Female', 'Unknown'];
               </select>
             </td>
 
-            <td><input type="number" name="set_level" value="<?= htmlspecialchars($monster->set_level) ?>" disabled></td>
+            <td><input type="number" name="set_level" value="<?= htmlspecialchars($monster->set_level) ?>"></td>
 
-            <td><input type="text" name="set_short" value="<?= htmlspecialchars($monster->set_short) ?>" disabled></td>
+            <td><input type="text" name="set_short" value="<?= htmlspecialchars($monster->set_short) ?>"></td>
 
-            <td><input type="text" name="set_name" value="<?= htmlspecialchars($monster->set_name) ?>" disabled></td>
+            <td><input type="text" name="set_name" value="<?= htmlspecialchars($monster->set_name) ?>"></td>
 
-            <td><textarea name="set_long" rows="2" disabled><?= htmlspecialchars($monster->set_long) ?></textarea></td>
+            <td><input type="text" name="set_spells" value="<?= htmlspecialchars($monster->set_spells) ?>"></td>
 
-            <td><input type="text" name="set_spells" value="<?= htmlspecialchars($monster->set_spells) ?>" disabled></td>
+            <td><textarea name="set_long" rows="2"><?= htmlspecialchars($monster->set_long) ?></textarea></td>
 
             <td>
-            <button class="btn" type="button"
-              onclick='editMonster(<?= json_encode($monster, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)'>
-              Edit
-            </button>
-
+              <button class="btn" type="submit">Update</button>
           </form>
           <form method="POST" style="display:inline;">
             <input type="hidden" name="id" value="<?= $monster->id ?>">
@@ -474,24 +468,7 @@ $genders = ['Male', 'Female', 'Unknown'];
       }
     }
 
-    function editMonster(monster) {
-      const form = document.getElementById("monsterForm");
-      form.dataset.mode = "update";
-      document.getElementById("formAction").value = "update";
-      document.getElementById("submitButton").textContent = "Update Monster";
-      document.getElementById("monsterId").value = monster.id;
-
-      document.getElementById("classSelect").value = monster.set_class;
-      document.getElementById("raceSelect").value = monster.set_race;
-      document.getElementById("genderSelect").value = monster.set_gender;
-      document.getElementById("levelInput").value = monster.set_level;
-      document.getElementById("shortInput").value = monster.set_short;
-      document.getElementById("nameInput").value = monster.set_name;
-      document.getElementById("longdescInput").value = monster.set_long;
-      document.getElementById("spellsInput").value = monster.set_spells;
-    }
-
-</script>
+  </script>
 
 </body>
 
