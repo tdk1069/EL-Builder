@@ -74,6 +74,7 @@ $tables = [
             set_race TEXT NOT NULL,
             set_level INT(11) NOT NULL,
             set_gender TEXT NOT NULL,
+            set_alignment INT(11) NOT NULL,
             PRIMARY KEY (id)
         )
     ",

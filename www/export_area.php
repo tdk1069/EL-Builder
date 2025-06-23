@@ -377,7 +377,13 @@ foreach ($monsters as $monster) {
 
     $spellsLine = '';
     if (!empty($spellArray)) {
-        $spellsLine = '    set_spells(({' . implode(', ', array_map(fn($s) => "\"$s\"", $spellArray)) . '}));';
+        $spellsLine = '\n    set_spells(({' . implode(', ', array_map(fn($s) => "\"$s\"", $spellArray)) . '}));';
+    }
+
+    $alignment = $monster['set_alignment'] ?? '0';
+    $alignmentLine = '';
+    if ($alignment) {
+        $alignmentLine = "\n    set_alignment(" . $alignment . ");";
     }
 
     $filename = "$monsterDir/{$name}.c";
@@ -412,8 +418,7 @@ void create()
     set_level(BASE_LEVEL + ({$levelOffset}));
     set_gender("{$gender}");
     set_race("{$race}");
-    set_class("{$class}");{$addObjectCode}{$commands}
-{$spellsLine}
+    set_class("{$class}");{$addObjectCode}{$commands}{$spellsLine}{$alignmentLine}
 }
 C;
 

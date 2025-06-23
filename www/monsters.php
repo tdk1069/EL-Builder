@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
     if ($action === 'add') {
-      $stmt = $pdo->prepare("INSERT INTO monsters (owner, set_class, set_race, set_gender, set_level, set_short, set_spells, set_name, set_long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+      $stmt = $pdo->prepare("INSERT INTO monsters (owner, set_class, set_race, set_gender, set_level, set_short, set_spells, set_name, set_alignment, set_long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
       $stmt->execute([
         $username,
         $_POST['set_class'],
@@ -24,10 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_POST['set_short'],
         $_POST['set_spells'],
         $_POST['set_name'],
+        $_POST['set_alignment'],
         $_POST['set_long']
       ]);
     } elseif ($action === 'update' && isset($_POST['id'])) {
-      $stmt = $pdo->prepare("UPDATE monsters SET set_class=?, set_race=?, set_gender=?, set_level=?, set_short=?, set_spells=?, set_name=?, set_long=? WHERE id=? AND owner=?");
+      $stmt = $pdo->prepare("UPDATE monsters SET set_class=?, set_race=?, set_gender=?, set_level=?, set_short=?, set_spells=?, set_name=?, set_long=? , set_alignment=? WHERE id=? AND owner=?");
       $stmt->execute([
         $_POST['set_class'],
         $_POST['set_race'],
@@ -37,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_POST['set_spells'],
         $_POST['set_name'],
         $_POST['set_long'],
+        $_POST['set_alignment'],
         $_POST['id'],
         $username
       ]);
@@ -194,6 +196,14 @@ td textarea {
     .full-width {
       grid-column: 1 / -1;
     }
+#alignmentSlider {
+  width: 300px;
+  margin: 0 1em;
+}
+#alignmentLabel {
+  font-weight: bold;
+  padding-left: 0.5em;
+}
 
   </style>
 </head>
@@ -253,6 +263,11 @@ td textarea {
         <input type="text" name="set_spells" id="spellsInput">
       </label>
 
+      <label for="alignmentSlider">Alignment:
+        <input type="range" id="alignmentSlider" name="set_alignment" min="-1250" max="1250" step="50" value="0" oninput="updateAlignmentLabel(this.value)">
+        <span id="alignmentLabel">NEUTRAL</span>
+      </label>
+
       <label class="full-width">Long Description:
         <textarea name="set_long" id="longdescInput" rows="3" required></textarea>
       </label>
@@ -278,6 +293,7 @@ td textarea {
         <th>Name</th>
         <th>Long</th>
         <th>Spells/Skills</th>
+        <th>Alignment</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -324,6 +340,8 @@ td textarea {
             <td><textarea name="set_long" rows="2" disabled><?= htmlspecialchars($monster->set_long) ?></textarea></td>
 
             <td><input type="text" name="set_spells" value="<?= htmlspecialchars($monster->set_spells) ?>" disabled></td>
+
+            <td><input type="text" name="set_alignment" value="<?= htmlspecialchars($monster->set_alignment) ?>" disabled></td>
 
             <td>
             <button class="btn" type="button"
@@ -485,6 +503,7 @@ td textarea {
         levelInput.value = random.set_level || '';
         raceSelect.value = random.set_race || '';
         genderSelect.value = random.set_gender || '';
+        alignmentSlider.value = random.set_alignment || '';
       } else {
         shortInput.value = '';
         spellsInput.value = '';
@@ -493,6 +512,7 @@ td textarea {
         levelInput.value = '';
         raceSelect.value = '';
         genderSelect.value = '';
+        alignmentSlider.value = '';
       }
     }
 
@@ -511,6 +531,24 @@ td textarea {
       document.getElementById("nameInput").value = monster.set_name;
       document.getElementById("longdescInput").value = monster.set_long;
       document.getElementById("spellsInput").value = monster.set_spells;
+      document.getElementById("alignmentSlider").value = monster.set_alignment;
+    }
+
+    function updateAlignmentLabel(value) {
+      const val = parseInt(value);
+      const label = document.getElementById("alignmentLabel");
+
+      if (val >= 1125) label.textContent = "SAINTLY";
+      else if (val >= 875) label.textContent = "RIGHTEOUS";
+      else if (val >= 625) label.textContent = "GOOD";
+      else if (val >= 375) label.textContent = "BENEVOLENT";
+      else if (val >= 125) label.textContent = "NICE";
+      else if (val > -125) label.textContent = "NEUTRAL";
+      else if (val >= -375) label.textContent = "MEAN";
+      else if (val >= -625) label.textContent = "MALEVOLENT";
+      else if (val >= -875) label.textContent = "EVIL";
+      else if (val >= -1125) label.textContent = "NEFARIOUS";
+      else label.textContent = "DEMONIC";
     }
 
 </script>
