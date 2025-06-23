@@ -112,6 +112,7 @@ $genders = ['Male', 'Female', 'Unknown'];
     table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
       margin-top: 20px;
       background-color: rgba(255, 248, 220, 0.95);
       border: 2px solid #7a5c3e;
@@ -142,6 +143,13 @@ $genders = ['Male', 'Female', 'Unknown'];
       width: 100%;
       font-family: 'Georgia', serif;
     }
+td input,
+td select,
+td textarea {
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}
 
     .form-row {
       margin-top: 20px;
@@ -172,6 +180,21 @@ $genders = ['Male', 'Female', 'Unknown'];
     .btn:hover {
       background-color: #5a3e2b;
     }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .form-grid label {
+      display: block;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
   </style>
 </head>
 
@@ -180,68 +203,67 @@ $genders = ['Male', 'Female', 'Unknown'];
   <h1>Welcome, <?= htmlspecialchars($username) ?> – Your Monsters</h1>
 
   <!-- Add New Monster -->
-  <div class="form-row">
-    <h2>Add New Monster</h2>
-    <form method="POST" id="monsterForm" data-mode="add">
-      <input type="hidden" name="action" id="formAction" value="add">
-      <input type="hidden" name="id" id="monsterId" value="">
+<div class="form-row">
+  <h2>Add New Monster</h2>
+  <form method="POST" id="monsterForm" data-mode="add">
+    <input type="hidden" name="action" id="formAction" value="add">
+    <input type="hidden" name="id" id="monsterId" value="">
 
+    <div class="form-grid">
       <label>Class:
         <select name="set_class" id="classSelect" required onchange="fillExample()">
           <option value="">-- Select --</option>
-          <?php
-          foreach ($classes as $class) {
-            echo "<option value=\"$class\">$class</option>";
-          }
-          ?>
+          <?php foreach ($classes as $class): ?>
+            <option value="<?= $class ?>"><?= $class ?></option>
+          <?php endforeach; ?>
         </select>
       </label>
 
       <label>Race:
         <select name="set_race" id="raceSelect" required>
           <option value="">-- Select --</option>
-          <?php
-          foreach ($races as $race) {
-            echo "<option value=\"$race\">$race</option>";
-          }
-          ?>
+          <?php foreach ($races as $race): ?>
+            <option value="<?= $race ?>"><?= $race ?></option>
+          <?php endforeach; ?>
         </select>
       </label>
 
       <label>Gender:
         <select name="set_gender" id="genderSelect" required>
           <option value="">-- Select --</option>
-          <?php
-          foreach ($genders as $gender) {
-            echo "<option value=\"$gender\">$gender</option>";
-          }
-          ?>
+          <?php foreach ($genders as $gender): ?>
+            <option value="<?= $gender ?>"><?= $gender ?></option>
+          <?php endforeach; ?>
         </select>
       </label>
 
       <label>Level:
         <input type="number" name="set_level" id="levelInput" min="1" max="100" required>
-      </label><br><br>
+      </label>
 
       <label>Short Description:
         <input type="text" name="set_short" id="shortInput" required>
-      </label><br><br>
+      </label>
 
       <label>Name:
         <input type="text" name="set_name" id="nameInput" required>
-      </label><br><br>
+      </label>
 
-      <label>Long Description:
-        <textarea name="set_long" id="longdescInput" rows="4" required></textarea>
-      </label><br><br>
-
-      <label>Skills/Spells (Comma seperated):
+      <label>Skills/Spells (comma separated):
         <input type="text" name="set_spells" id="spellsInput">
-      </label><br><br>
+      </label>
 
-      <button class="btn" type="submit" id="submitButton">Add Monster</button>
-    </form>
-  </div>
+      <label class="full-width">Long Description:
+        <textarea name="set_long" id="longdescInput" rows="3" required></textarea>
+      </label>
+
+      <div class="full-width">
+        <button class="btn" type="submit" id="submitButton">Add Monster</button>
+      </div>
+    </div>
+  </form>
+</div>
+
 
   <!-- List of Monsters -->
   <table>
