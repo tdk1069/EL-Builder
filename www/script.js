@@ -193,20 +193,26 @@ function key(x, y, z = 0) {
 }
 
 function saveRoom() {
+  const curKey  = key(currentX, currentY, currentZ);
+  const existing = grid[curKey] || {};          // ← keep old data
+
   const room = {
-    set_short: document.getElementById("set_short").value,
-    set_long: document.getElementById("set_long").value,
-    set_smell: document.getElementById("set_smell").value,
-    set_terrain: document.getElementById("terrainSelect").value,
-    set_items: getItems(),
-    exits: grid[key(currentX, currentY, currentZ)]?.exits || {},
-    monsters: getMonsters(),
-    objects: getObjects(),
-    notes: document.getElementById("notes").value,
+    ...existing,                                // ← preserve exitTypes, monsters, etc.
+    set_short : document.getElementById("set_short").value,
+    set_long  : document.getElementById("set_long").value,
+    set_smell : document.getElementById("set_smell").value,
+    set_terrain : document.getElementById("terrainSelect").value,
+    set_items : getItems(),
+    exits     : existing.exits || {},           // keep the same exits array
+    monsters  : getMonsters(),
+    objects   : getObjects(),
+    notes     : document.getElementById("notes").value,
   };
-  grid[key(currentX, currentY, currentZ)] = room;
+
+  grid[curKey] = room;
   drawMap();
 }
+
 
 function move(dir) {
   // Save current room before moving
@@ -419,6 +425,7 @@ function addItemRow(name = "", description = "") {
 function drawMap() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   squareMap = {}; // Reset on redraw
+  exitLines.length = 0;    // 🔑 start fresh here!
 
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
@@ -443,44 +450,48 @@ function drawMap() {
 
 for (const dir in room.exits) {
   const targetKey = room.exits[dir];
-  const [tx, ty, tz] = targetKey.split(",").map(Number);
-  if (tz !== currentZ) continue;
+  if (!grid[targetKey]) continue; // Skip missing rooms
 
-  const txPx = centerX + (tx - currentX) * ROOM_SPACING;
-  const tyPx = centerY + (ty - currentY) * ROOM_SPACING;
+  // Only draw if this side should own the connection
+  if (k < targetKey) {
+    const [tx, ty, tz] = targetKey.split(",").map(Number);
+    if (tz !== currentZ) continue;
 
-  const isDoor = (room.exitTypes?.[dir] === "door");
+    const txPx = centerX + (tx - currentX) * ROOM_SPACING;
+    const tyPx = centerY + (ty - currentY) * ROOM_SPACING;
 
-  ctx.strokeStyle = isDoor ? "#c90" : "#999"; // yellow-brown if door
-  ctx.setLineDash(isDoor ? [6, 6] : []);
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(px + TILE_SIZE / 2, py + TILE_SIZE / 2);
-  ctx.lineTo(txPx + TILE_SIZE / 2, tyPx + TILE_SIZE / 2);
-  ctx.stroke();
-  ctx.setLineDash([]);
+    const isDoor = (room.exitTypes?.[dir] === "door");
 
-  // Add emoji/icon if door
-  if (isDoor) {
-    const midX = (px + TILE_SIZE / 2 + txPx + TILE_SIZE / 2) / 2;
-    const midY = (py + TILE_SIZE / 2 + tyPx + TILE_SIZE / 2) / 2;
+    // Emoji for door
+    if (isDoor) {
+      const midX = (px + TILE_SIZE / 2 + txPx + TILE_SIZE / 2) / 2;
+      const midY = (py + TILE_SIZE / 2 + tyPx + TILE_SIZE / 2) / 2;
+      ctx.font = "18px serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("🚪", midX , midY);
+    }
 
-    ctx.font = "18px serif";  // Adjust size & font as needed
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("🚪", midX, midY);
+    ctx.strokeStyle = isDoor ? "#c90" : "#999";
+//    ctx.setLineDash(isDoor ? [6, 6] : []);
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(px + TILE_SIZE / 2, py + TILE_SIZE / 2);
+    ctx.lineTo(txPx + TILE_SIZE / 2, tyPx + TILE_SIZE / 2);
+    ctx.stroke();
+//    ctx.setLineDash([]);
+
+    // Clickable line
+    exitLines.push({
+      x1: px + TILE_SIZE / 2,
+      y1: py + TILE_SIZE / 2,
+      x2: txPx + TILE_SIZE / 2,
+      y2: tyPx + TILE_SIZE / 2,
+      fromKey: k,
+      toKey: targetKey,
+      dir: dir
+    });
   }
-
-  // Store the line for click detection
-  exitLines.push({
-    x1: px + TILE_SIZE / 2,
-    y1: py + TILE_SIZE / 2,
-    x2: txPx + TILE_SIZE / 2,
-    y2: tyPx + TILE_SIZE / 2,
-    fromKey: k,
-    toKey: targetKey,
-    dir: dir
-  });
 }
   }
 
