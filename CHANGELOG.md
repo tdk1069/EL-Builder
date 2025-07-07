@@ -5,6 +5,7 @@
 - 📝 Added a changelog file.
 - 🧱 Fixed door icons vanishing when moving between rooms.
 - 🧼 Removed unused code.
+- 🧾 Fixed word wrapping issue in long room descriptions.
 
 ## [2025-06-23]
 - 🧌 Added alignment slider to monster editor.
