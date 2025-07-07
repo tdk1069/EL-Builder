@@ -245,7 +245,7 @@ C;
     file_put_contents($filename, $code);
 }
 
-function formatLongText($functionName, $text, $indent = '    ', $wrapLength = 72) {
+function formatLongText_old($functionName, $text, $indent = '    ', $wrapLength = 72) {
     $wrapped = wordwrap($text, $wrapLength - strlen($indent) - 2, "\n", false);
     $lines = explode("\n", $wrapped);
 
@@ -257,6 +257,73 @@ function formatLongText($functionName, $text, $indent = '    ', $wrapLength = 72
     return $result;
 }
 
+function formatLongText(
+    string $functionName,
+    string $text,
+    string $indent = '    ',
+    int    $wrapLength = 72
+): string {
+    // We’ll insert one extra character (a trailing space) per wrapped line,
+    // so budget for it.
+    $available = $wrapLength - strlen($indent) - 3; // 2 quotes + 1 space
+
+    // Wrap without cutting words; break on newline.
+    $wrapped = wordwrap($text, $available, "\n", false);
+    $lines   = explode("\n", $wrapped);
+
+    $last = count($lines) - 1;
+
+    // First line
+    $result  = $indent . $functionName . "(\"" .
+               $lines[0] . ($last ? ' ' : '') . "\"\n";
+
+    // Any subsequent lines
+    for ($i = 1; $i <= $last; $i++) {
+        $result .= $indent . "  \"" .
+                   $lines[$i] . ($i < $last ? ' ' : '') . "\"\n";
+    }
+
+    return rtrim($result) . ");";
+}
+
+$doorMap = []; // [coords][] = ['dir' => ..., 'tag' => ...]
+$seenTags = []; // track unique door tags to count later
+
+foreach ($grid as $coords => $room) {
+    $exits     = $room['exits']     ?? [];
+    $exitTypes = $room['exitTypes'] ?? [];
+
+    foreach ($exitTypes as $dir => $type) {
+        if ($type === 'door' && isset($exits[$dir])) {
+            $from = $coords;
+            $to   = $exits[$dir];
+
+            // Generate consistent tag
+            $pair = [$from, $to];
+            sort($pair, SORT_STRING);
+            $tag = 'door_' . str_replace([',',' '], '_', $pair[0]) . '_' . str_replace([',',' '], '_', $pair[1]);
+            $seenTags[$tag] = true;
+
+            // Forward direction
+            $doorMap[$from][$dir] = ['dir' => $dir, 'tag' => $tag];
+
+            // Reverse direction
+            $revDir = [
+                'north' => 'south', 'south' => 'north',
+                'east' => 'west',   'west' => 'east',
+                'northeast' => 'southwest', 'southwest' => 'northeast',
+                'northwest' => 'southeast', 'southeast' => 'northwest',
+                'up' => 'down',     'down' => 'up'
+            ][$dir] ?? null;
+
+            if ($revDir) {
+                $doorMap[$to][$revDir] = ['dir' => $revDir, 'tag' => $tag];
+            }
+        }
+    }
+}
+
+$totalDoors = count($seenTags);
 
 // Generate room files
 foreach ($grid as $coords => $room) {
@@ -266,6 +333,7 @@ foreach ($grid as $coords => $room) {
     $long = formatLongText("set_long",addslashes(trim($room['set_long'] ?? '')));
     $items = $room['set_items'] ?? [];
     $exits = $room['exits'] ?? [];
+$exitTypes = $room['exitTypes'] ?? [];
     $terrain = '';
     $rawTerrain = trim($room['set_terrain'] ?? '');
     if ($rawTerrain !== '') {
@@ -337,6 +405,22 @@ $itemBlock = empty($itemStrs) ? '' : "    set_items(([\n" . implode(",\n", $item
         }
     }
 
+$doorLines = '';
+if (isset($doorMap[$coords])) {
+    $alreadyDone = [];
+    foreach ($doorMap[$coords] as $dir => $doorInfo) {
+        $key = $dir . '|' . $doorInfo['tag'];
+        if (isset($alreadyDone[$key])) continue;
+        $alreadyDone[$key] = true;
+
+        if ($totalDoors === 1) {
+            $doorLines .= "    set_door(\"door\", \"{$dir}\");\n";
+        } else {
+            $name = "{$dir} door";
+            $doorLines .= "    set_door(\"{$name}\", \"{$dir}\", 0, \"{$doorInfo['tag']}\", 0);\n";
+        }
+    }
+}
 
     $roomCode = <<<C
 $comments
@@ -352,7 +436,7 @@ void create()
 $short
 $long
 $terrain
-$itemBlock$exitBlock$monsterLines$objectLines}
+$itemBlock$exitBlock$doorLines$monsterLines$objectLines}
 C;
 
     file_put_contents("$baseDir/rooms/$fileName" . ".c", $roomCode);
