@@ -9,6 +9,7 @@ let grid = {};
 let currentX = 0;
 let currentY = 0;
 let currentZ = 0;
+let zoom = 1.0;
 
 let squareMap = {}; // key: "x,y,z", value: {x: px, y: py, w: TILE_SIZE, h: TILE_SIZE}
 let exitLines = []; // Global or scoped appropriately
@@ -430,15 +431,23 @@ function drawMap() {
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
 
+  const scaledSpacing = ROOM_SPACING * zoom;
+  const scaledTile = TILE_SIZE * zoom;
+
   for (const k in grid) {
     const [x, y, z] = k.split(",").map(Number);
     if (z !== currentZ) continue;
 
-    const px = centerX + (x - currentX) * ROOM_SPACING;
-    const py = centerY + (y - currentY) * ROOM_SPACING;
+    //const px = centerX + (x - currentX) * ROOM_SPACING;
+    //const py = centerY + (y - currentY) * ROOM_SPACING;
+
+
+    const px = centerX + (x - currentX) * scaledSpacing;
+    const py = centerY + (y - currentY) * scaledSpacing;
+
 
     const room = grid[k];
-// console.log(room);
+
     // Store square bounds
     squareMap[`${x},${y},${z}`] = {
       x: px,
@@ -457,8 +466,8 @@ for (const dir in room.exits) {
     const [tx, ty, tz] = targetKey.split(",").map(Number);
     if (tz !== currentZ) continue;
 
-    const txPx = centerX + (tx - currentX) * ROOM_SPACING;
-    const tyPx = centerY + (ty - currentY) * ROOM_SPACING;
+    const txPx = centerX + (tx - currentX) * scaledSpacing;
+    const tyPx = centerY + (ty - currentY) * scaledSpacing;
 
     const isDoor = (room.exitTypes?.[dir] === "door");
 
@@ -476,17 +485,17 @@ for (const dir in room.exits) {
 //    ctx.setLineDash(isDoor ? [6, 6] : []);
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(px + TILE_SIZE / 2, py + TILE_SIZE / 2);
-    ctx.lineTo(txPx + TILE_SIZE / 2, tyPx + TILE_SIZE / 2);
+    ctx.moveTo(px + scaledTile / 2, py + scaledTile / 2);
+    ctx.lineTo(txPx + scaledTile / 2, tyPx + scaledTile / 2);
     ctx.stroke();
 //    ctx.setLineDash([]);
 
     // Clickable line
     exitLines.push({
-      x1: px + TILE_SIZE / 2,
-      y1: py + TILE_SIZE / 2,
-      x2: txPx + TILE_SIZE / 2,
-      y2: tyPx + TILE_SIZE / 2,
+      x1: px + scaledTile / 2,
+      y1: py + scaledTile / 2,
+      x2: txPx + scaledTile / 2,
+      y2: tyPx + scaledTile / 2,
       fromKey: k,
       toKey: targetKey,
       dir: dir
@@ -499,16 +508,16 @@ for (const dir in room.exits) {
     const [x, y, z] = k.split(",").map(Number);
     if (z !== currentZ) continue;
 
-    const px = centerX + (x - currentX) * ROOM_SPACING;
-    const py = centerY + (y - currentY) * ROOM_SPACING;
+    const px = centerX + (x - currentX) * scaledSpacing;
+    const py = centerY + (y - currentY) * scaledSpacing;
 
     const room = grid[k];
 
     // Draw room square
     ctx.fillStyle = x === currentX && y === currentY ? "#3a6" : "#555";
-    ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+    ctx.fillRect(px, py, scaledTile, scaledTile);
     ctx.strokeStyle = "#aaa";
-    ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+    ctx.strokeRect(px, py, scaledTile, scaledTile);
 
     // Draw up/down indicators
     ctx.font = "12px sans-serif";
@@ -517,12 +526,12 @@ for (const dir in room.exits) {
 
     if (room.exits["up"]) {
       ctx.fillStyle = "#6cf"; // light blue
-      ctx.fillText("↑", px + TILE_SIZE + 8, py + TILE_SIZE / 2 - 8);
+      ctx.fillText("↑", px + scaledTile + 8, py + scaledTile / 2 - 8);
     }
 
     if (room.exits["down"]) {
       ctx.fillStyle = "#ffffcc";
-      ctx.fillText("↓", px + TILE_SIZE + 8, py + TILE_SIZE / 2 + 8);
+      ctx.fillText("↓", px + scaledTile + 8, py + scaledTile / 2 + 8);
     }
   }
 // drawMap();
@@ -816,6 +825,15 @@ window.addEventListener("DOMContentLoaded", () => {
   // You can also use areaMeta to populate a sidebar or title
   // document.getElementById("areaName").textContent = areaMeta.name || "Unnamed Area";
 });
+
+canvas.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const delta = Math.sign(e.deltaY);
+  zoom += delta * -0.1;
+  zoom = Math.min(Math.max(zoom, 0.5), 3.0);
+  drawMap();
+});
+
 
 canvas.addEventListener("click", (e) => {
   const rect = canvas.getBoundingClientRect();
