@@ -431,7 +431,7 @@ function drawMap() {
     const py = centerY + (y - currentY) * ROOM_SPACING;
 
     const room = grid[k];
-// console.log(room);
+
     // Store square bounds
     squareMap[`${x},${y},${z}`] = {
       x: px,
@@ -441,47 +441,32 @@ function drawMap() {
       roomKey: k,
     };
 
-for (const dir in room.exits) {
-  const targetKey = room.exits[dir];
-  const [tx, ty, tz] = targetKey.split(",").map(Number);
-  if (tz !== currentZ) continue;
+    for (const dir in room.exits) {
+      const targetKey = room.exits[dir];
+      const [tx, ty, tz] = targetKey.split(",").map(Number);
+      if (tz !== currentZ) continue;
 
-  const txPx = centerX + (tx - currentX) * ROOM_SPACING;
-  const tyPx = centerY + (ty - currentY) * ROOM_SPACING;
+      const txPx = centerX + (tx - currentX) * ROOM_SPACING;
+      const tyPx = centerY + (ty - currentY) * ROOM_SPACING;
 
-  const isDoor = (room.exitTypes?.[dir] === "door");
+      ctx.strokeStyle = "#999";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(px + TILE_SIZE / 2, py + TILE_SIZE / 2);
+      ctx.lineTo(txPx + TILE_SIZE / 2, tyPx + TILE_SIZE / 2);
+      ctx.stroke();
 
-  ctx.strokeStyle = isDoor ? "#c90" : "#999"; // yellow-brown if door
-  ctx.setLineDash(isDoor ? [6, 6] : []);
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(px + TILE_SIZE / 2, py + TILE_SIZE / 2);
-  ctx.lineTo(txPx + TILE_SIZE / 2, tyPx + TILE_SIZE / 2);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Add emoji/icon if door
-  if (isDoor) {
-    const midX = (px + TILE_SIZE / 2 + txPx + TILE_SIZE / 2) / 2;
-    const midY = (py + TILE_SIZE / 2 + tyPx + TILE_SIZE / 2) / 2;
-
-    ctx.font = "18px serif";  // Adjust size & font as needed
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("🚪", midX, midY);
-  }
-
-  // Store the line for click detection
-  exitLines.push({
-    x1: px + TILE_SIZE / 2,
-    y1: py + TILE_SIZE / 2,
-    x2: txPx + TILE_SIZE / 2,
-    y2: tyPx + TILE_SIZE / 2,
-    fromKey: k,
-    toKey: targetKey,
-    dir: dir
-  });
-}
+      // Store the line for click detection
+      exitLines.push({
+        x1: px + TILE_SIZE / 2,
+        y1: py + TILE_SIZE / 2,
+        x2: txPx + TILE_SIZE / 2,
+        y2: tyPx + TILE_SIZE / 2,
+        fromKey: k,
+        toKey: targetKey,
+        dir: dir
+      });
+    }
   }
 
   for (const k in grid) {
@@ -514,7 +499,6 @@ for (const dir in room.exits) {
       ctx.fillText("↓", px + TILE_SIZE + 8, py + TILE_SIZE / 2 + 8);
     }
   }
-// drawMap();
 }
 
 function downloadArea() {
@@ -821,42 +805,6 @@ canvas.addEventListener("click", (e) => {
       break;
     }
   }
-
-for (const line of exitLines) {
-  if (isPointNearLine(mouseX, mouseY, line.x1, line.y1, line.x2, line.y2, 6)) {
-    console.log("Clicked on exit from", line.fromKey, "to", line.toKey, "dir", line.dir);
-
-    const fromRoom = grid[line.fromKey];
-    const toRoom = grid[line.toKey];
-
-    if (!fromRoom.exitTypes) fromRoom.exitTypes = {};
-    if (!toRoom.exitTypes) toRoom.exitTypes = {};
-
-    // Toggle door status on fromRoom
-    const newType = (fromRoom.exitTypes[line.dir] === "door") ? "normal" : "door";
-    fromRoom.exitTypes[line.dir] = newType;
-
-    // Reverse direction map
-    const reverseDir = {
-      north: "south", south: "north",
-      east: "west", west: "east",
-      northeast: "southwest", southwest: "northeast",
-      northwest: "southeast", southeast: "northwest",
-      up: "down", down: "up"
-    };
-
-    const revDir = reverseDir[line.dir];
-
-    // Update the toRoom exitTypes in reverse direction
-    if (revDir) {
-      toRoom.exitTypes[revDir] = newType;
-    }
-
-    drawMap(); // redraw to show updated door status
-    break;
-  }
-}
-
 });
 
 document.addEventListener("click", (e) => {
@@ -1141,34 +1089,7 @@ if (exitMatch) {
   closeImportModal();
 }
 
-function isPointNearLine(px, py, x1, y1, x2, y2, threshold) {
-  const A = px - x1;
-  const B = py - y1;
-  const C = x2 - x1;
-  const D = y2 - y1;
 
-  const dot = A * C + B * D;
-  const len_sq = C * C + D * D;
-  let param = -1;
-  if (len_sq !== 0) param = dot / len_sq;
-
-  let xx, yy;
-
-  if (param < 0) {
-    xx = x1;
-    yy = y1;
-  } else if (param > 1) {
-    xx = x2;
-    yy = y2;
-  } else {
-    xx = x1 + param * C;
-    yy = y1 + param * D;
-  }
-
-  const dx = px - xx;
-  const dy = py - yy;
-  return (dx * dx + dy * dy) <= threshold * threshold;
-}
 
 loadRoom();
 drawMap();

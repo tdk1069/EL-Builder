@@ -149,7 +149,7 @@ $roomJson = $roomRow ? $roomRow->data : null;
       </div>
 
       <!-- Tab Content Notes -->
-      <div id="tab-notes" class="tab-content">
+      <div id="tab-notes" class="tab-content"  style="display: none;">
       <div id="editor">
         <label for="notes" style="display:block; margin-bottom:0.5rem; font-weight:bold;">Room Notes:</label>
         <textarea id="notes" name="notes" rows="10" placeholder="Add design notes, ideas, or comments here..." style="width:100%; padding:0.75rem; font-family:monospace; border:1px solid #ccc; border-radius:8px; resize:vertical;box-sizing: border-box;"></textarea>
