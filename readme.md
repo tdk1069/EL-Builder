@@ -67,6 +67,7 @@ MIT License – see [`LICENSE`](LICENSE) for details.
 
 [View Changelog](CHANGELOG.md)
 
+---
 
 ## 🙏 Credits
 
