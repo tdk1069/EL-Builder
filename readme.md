@@ -65,6 +65,9 @@ MIT License – see [`LICENSE`](LICENSE) for details.
 
 ---
 
+[View Changelog](CHANGELOG.md)
+
+
 ## 🙏 Credits
 
 Crafted with love for old-school text-based worlds.
