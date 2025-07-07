@@ -1,6 +1,8 @@
 # Changelog
 
 ## [2025-07-07]
+- 🔍 Added zoom support to the map via mouse wheel.
+- 📝 Added a changelog file.
 - 🧱 Fixed door icons vanishing when moving between rooms.
 - 🧼 Removed unused code.
 
