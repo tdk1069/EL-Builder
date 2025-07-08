@@ -1,5 +1,8 @@
 # Changelog
 
+## [2025-07-08]
+- 🧩 Updated door icon size to scale correctly with current zoom level.
+
 ## [2025-07-07]
 - 🔍 Added zoom support to the map via mouse wheel.
 - 📝 Added a changelog file.
