@@ -473,22 +473,20 @@ for (const dir in room.exits) {
 
     // Emoji for door
     if (isDoor) {
-      const midX = (px + TILE_SIZE / 2 + txPx + TILE_SIZE / 2) / 2;
-      const midY = (py + TILE_SIZE / 2 + tyPx + TILE_SIZE / 2) / 2;
-      ctx.font = "18px serif";
+      const midX = (px + scaledTile / 2 + txPx + scaledTile / 2) / 2;
+      const midY = (py + scaledTile / 2 + tyPx + scaledTile / 2) / 2;
+      ctx.font = `${18 * zoom}px serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("🚪", midX , midY);
     }
 
     ctx.strokeStyle = isDoor ? "#c90" : "#999";
-//    ctx.setLineDash(isDoor ? [6, 6] : []);
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.moveTo(px + scaledTile / 2, py + scaledTile / 2);
     ctx.lineTo(txPx + scaledTile / 2, tyPx + scaledTile / 2);
     ctx.stroke();
-//    ctx.setLineDash([]);
 
     // Clickable line
     exitLines.push({
@@ -534,7 +532,6 @@ for (const dir in room.exits) {
       ctx.fillText("↓", px + scaledTile + 8, py + scaledTile / 2 + 8);
     }
   }
-// drawMap();
 }
 
 function downloadArea() {
