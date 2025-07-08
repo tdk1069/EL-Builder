@@ -532,6 +532,7 @@ td textarea {
       document.getElementById("longdescInput").value = monster.set_long;
       document.getElementById("spellsInput").value = monster.set_spells;
       document.getElementById("alignmentSlider").value = monster.set_alignment;
+      updateAlignmentLabel(monster.set_alignment);
     }
 
     function updateAlignmentLabel(value) {
