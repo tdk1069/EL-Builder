@@ -1001,6 +1001,7 @@ function addMonsterRow(selectedId = "") {
   row.appendChild(select);
   row.appendChild(removeBtn);
   container.appendChild(row);
+  saveRoom();
 }
 
 function getMonsters() {
@@ -1194,6 +1195,197 @@ function isPointNearLine(px, py, x1, y1, x2, y2, threshold) {
   const dx = px - xx;
   const dy = py - yy;
   return (dx * dx + dy * dy) <= threshold * threshold;
+}
+
+// monster stuff
+
+  function openMonsterModal() {
+    loadMonsterDropdown();
+    document.getElementById("monsterModal").style.display = "flex";
+    document.getElementById('monsterId').value = '';
+    document.getElementById('shortInput').value = '';
+    document.getElementById('spellsInput').value = '';
+    document.getElementById('nameInput').value = '';
+    document.getElementById('longdescInput').value = '';
+    document.getElementById('levelInput').value = '';
+    document.getElementById('raceSelect').value = '';
+    document.getElementById('genderSelect').value = '';
+    document.getElementById('classSelect').value = '';
+    document.getElementById('alignmentSelect').value = '0';
+  }
+
+  function closeMonsterModal() {
+    document.getElementById("monsterModal").style.display = "none";
+  }
+
+  // Close on outside click
+  window.addEventListener("click", function (event) {
+    const modal = document.getElementById("monsterModal");
+    if (event.target === modal) {
+      closeMonsterModal();
+    }
+  });
+
+  // Form submission handler
+  document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("monsterForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      console.log("Monster data submitted:", Object.fromEntries(formData.entries()));
+      closeMonsterModal();
+    });
+  });
+
+    function fillExample() {
+      const classType = document.getElementById('classSelect').value;
+      const shortInput = document.getElementById('shortInput');
+      const nameInput = document.getElementById('nameInput');
+      const longdescInput = document.getElementById('longdescInput');
+      const levelInput = document.getElementById('levelInput');
+      const raceSelect = document.getElementById('raceSelect');
+      const genderSelect = document.getElementById('genderSelect');
+
+      if (exampleMonsters[classType]) {
+        const random = exampleMonsters[classType][Math.floor(Math.random() * exampleMonsters[classType].length)];
+
+        shortInput.value = random.set_short || '';
+        spellsInput.value = random.set_spells || '';
+        nameInput.value = random.set_short || '';
+        longdescInput.value = random.set_long || '';
+        levelInput.value = random.set_level || '';
+        raceSelect.value = random.set_race || '';
+        genderSelect.value = random.set_gender || '';
+        alignmentSelect.value = random.set_alignment || getClosestAlignmentValue(0);
+      } else {
+        shortInput.value = '';
+        spellsInput.value = '';
+        nameInput.value = '';
+        longdescInput.value = '';
+        levelInput.value = '';
+        raceSelect.value = '';
+        genderSelect.value = '';
+        alignmentSlider.value = '';
+      }
+    }
+
+function fillExample_lazy() {
+  const classType = document.getElementById('classSelect').value;
+  const shortInput = document.getElementById('shortInput');
+  const nameInput = document.getElementById('nameInput');
+  const longdescInput = document.getElementById('longdescInput');
+  const levelInput = document.getElementById('levelInput');
+  const raceSelect = document.getElementById('raceSelect');
+  const genderSelect = document.getElementById('genderSelect');
+  const spellsInput = document.getElementById('spellsInput');
+  const alignmentSlider = document.getElementById('alignmentSlider');
+
+  if (exampleMonsters[classType]) {
+    const random = exampleMonsters[classType][Math.floor(Math.random() * exampleMonsters[classType].length)];
+
+    if (!shortInput.value) shortInput.value = random.set_short || '';
+    if (!spellsInput.value) spellsInput.value = random.set_spells || '';
+    if (!nameInput.value) nameInput.value = random.set_short || '';
+    if (!longdescInput.value) longdescInput.value = random.set_long || '';
+    if (!levelInput.value) levelInput.value = random.set_level || '';
+    if (!raceSelect.value) raceSelect.value = random.set_race || '';
+    if (!genderSelect.value) genderSelect.value = random.set_gender || '';
+    if (!alignmentSlider.value) alignmentSlider.value = random.set_alignment || '';
+  }
+}
+
+
+function getClosestAlignmentValue(val) {
+  const alignmentValues = [1250, 1000, 750, 500, 250, 0, -250, -500, -750, -1000, -1250];
+  let closest = alignmentValues[0];
+  let smallestDiff = Math.abs(val - closest);
+
+  for (let i = 1; i < alignmentValues.length; i++) {
+    const diff = Math.abs(val - alignmentValues[i]);
+    if (diff < smallestDiff) {
+      closest = alignmentValues[i];
+      smallestDiff = diff;
+    }
+  }
+  return closest.toString();
+}
+let loadedMonsters = [];
+
+function loadMonsterDropdown() {
+  fetch('get_monsters.php')
+    .then(response => response.json())
+    .then(data => {
+      loadedMonsters = data;
+      const dropdown = document.getElementById('monsterSelect');
+      dropdown.innerHTML = `<option value="">-- Select --</option>`;
+      data.forEach(monster => {
+        const option = document.createElement('option');
+        option.value = monster.id;
+        option.textContent = `${monster.set_name} (${monster.set_class}, L${monster.set_level})`;
+        dropdown.appendChild(option);
+      });
+    })
+    .catch(err => console.error('Failed to load monsters:', err));
+}
+
+document.getElementById('monsterSelect').addEventListener('change', function () {
+  const selectedId = parseInt(this.value);
+  const monster = loadedMonsters.find(m => m.id === selectedId);
+  if (!monster) return;
+
+  document.getElementById('monsterId').value = monster.id || '';
+  document.getElementById('shortInput').value = monster.set_short || '';
+  document.getElementById('spellsInput').value = monster.set_spells || '';
+  document.getElementById('nameInput').value = monster.set_name || '';
+  document.getElementById('longdescInput').value = monster.set_long || '';
+  document.getElementById('classSelect').value = monster.set_class || '';
+  document.getElementById('raceSelect').value = monster.set_race || '';
+  document.getElementById('genderSelect').value = monster.set_gender || '';
+  document.getElementById('levelInput').value = monster.set_level || '';
+  document.getElementById('alignmentSelect').value = getClosestAlignmentValue(monster.set_alignment);
+});
+document.getElementById('monsterSelect').addEventListener('change', function () {
+  const selectedId = this.value;
+  if (!selectedId) {
+    // Reset all fields to give a "new" monster form
+    document.getElementById('monsterId').value = '';
+    document.getElementById('shortInput').value = '';
+    document.getElementById('spellsInput').value = '';
+    document.getElementById('nameInput').value = '';
+    document.getElementById('longdescInput').value = '';
+    document.getElementById('levelInput').value = '';
+    document.getElementById('raceSelect').value = '';
+    document.getElementById('genderSelect').value = '';
+    document.getElementById('classSelect').value = '';
+    document.getElementById('alignmentSelect').value = '0';
+  }
+});
+
+function submitMonsterForm(event) {
+  event.preventDefault();
+
+  const form = document.getElementById('monsterForm');
+  const formData = new FormData(form);
+
+  const monsterId = document.getElementById('monsterId').value;
+  const action = monsterId ? 'update' : 'add';
+  formData.append('action', action);
+
+  fetch('save_monsters.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        addMonsterRow(data.id); // Handles both new & updated monsters visually
+        closeMonsterModal();
+      } else {
+        alert("Error: " + (data.error || "Unknown failure"));
+      }
+    })
+    .catch(err => {
+      alert("Save failed: " + err.message);
+    });
 }
 
 loadRoom();

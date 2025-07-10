@@ -184,37 +184,31 @@ $roomJson = $roomRow ? $roomRow->data : null;
     <h2>Add a New Monster</h2>
     <form id="monsterForm" onsubmit="submitMonsterForm(event)">
       <label>Name</label>
-      <input type="text" name="set_name" required id="nameInput">
+      <input type="text" name="nameInput" required id="nameInput">
 
       <label>Short Description</label>
-      <textarea name="set_short" id="shortInput"></textarea>
+      <textarea name="shortInput" id="shortInput"></textarea>
 
       <label>Long Description</label>
-      <textarea name="set_long" id="longdescInput"></textarea>
+      <textarea name="longdescInput" id="longdescInput"></textarea>
 
       <label>Spells</label>
-      <textarea name="set_spells" id="spellsInput"></textarea>
+      <textarea name="spellsInput" id="spellsInput"></textarea>
 
-<div style="display: flex; align-items: flex-end; gap: 0.5rem; margin-bottom: 1rem;">
-  <div style="flex: 1;">
-    <label for="classSelect">Class</label>
-    <select id="classSelect" name="set_class" required style="width: 100%;">
-      <option value="">-- Select Class --</option>
-      <option>Fighter</option>
-      <option>Warmage</option>
-      <option>Rogue</option>
-      <option>Cleric</option>
-      <option>Monk</option>
-      <option>Druid</option>
-      <option>Ranger</option>
-    </select>
-  </div>
-
-  <button type="button" onclick="fillExample()" style="height: 2.2rem; white-space: nowrap;">Fill Example</button>
-</div>
+	  <label for="classSelect">Class</label>
+	  <select id="classSelect" name="classSelect" required onchange="fillExample()">
+	    <option value="">-- Select Class --</option>
+	    <option>Fighter</option>
+	    <option>Warmage</option>
+	    <option>Rogue</option>
+	    <option>Cleric</option>
+	    <option>Monk</option>
+	    <option>Druid</option>
+	    <option>Ranger</option>
+	  </select>
 
       <label>Race</label>
- <select id="raceSelect" name="set_race" required>
+ <select id="raceSelect" name="raceSelect" required>
     <option value="">-- Select Race --</option>
     <option>Arachnid</option>
     <option>Artrell</option>
@@ -263,10 +257,10 @@ $roomJson = $roomRow ? $roomRow->data : null;
   </select>
 
       <label>Level</label>
-      <input type="number" name="set_level" id="levelInput" required>
+      <input type="number" name="levelInput" id="levelInput" required>
 
   <label for="genderSelect">Gender</label>
-  <select id="genderSelect" name="set_gender" id="genderSelect" required>
+  <select id="genderSelect" name="genderSelect" id="genderSelect" required>
     <option value="">-- Select Gender --</option>
     <option>Male</option>
     <option>Female</option>
@@ -274,7 +268,7 @@ $roomJson = $roomRow ? $roomRow->data : null;
   </select>
 
       <label for="alignmentSelect">Alignment:</label>
-      <select name="set_alignment" id="alignmentSelect" required>
+      <select name="alignmentSelect" id="alignmentSelect" required>
         <option value="1250">SAINTLY</option>
         <option value="1000">RIGHTEOUS</option>
         <option value="750">GOOD</option>
@@ -297,8 +291,6 @@ $roomJson = $roomRow ? $roomRow->data : null;
       <option value="">-- Select --</option>
     </select>
   </div>
-
-<input type="hidden" id="monsterId" name="id" value="">
 
   <!-- Buttons -->
   <div style="text-align: right;">
