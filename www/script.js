@@ -1388,5 +1388,40 @@ function submitMonsterForm(event) {
     });
 }
 
+function toggleInventory() {
+  const section = document.getElementById('inventorySection');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+
+function openItemModal() {
+  document.getElementById('itemModal').style.display = 'block';
+}
+
+function closeItemModal() {
+  document.getElementById('itemModal').style.display = 'none';
+}
+
+function loadItems() {
+  fetch('get_objects.php')
+    .then(res => res.json())
+    .then(items => {
+      const select = document.getElementById('itemSelect');
+      select.innerHTML = '<option value="">-- Select --</option>'; // Clear + default
+
+      items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = `${item.short} (Lvl ${item.level})`;
+        select.appendChild(option);
+      });
+    })
+    .catch(err => {
+      console.error('Failed to load items:', err);
+    });
+}
+
+// Auto-load when modal is opened (optional)
+document.getElementById('itemSelect')?.addEventListener('focus', loadItems);
+
 loadRoom();
 drawMap();
